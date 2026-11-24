@@ -1,6 +1,6 @@
 name: Deploy
 
-# Deploys to Firebase Hosting (plus Firestore/Storage rules) on every push to main.
+# Deploys to Firebase Hosting (plus Firestore/Storage rules) on every push to main or feature/attendance-app.
 # Needs repository secrets (Settings → Secrets and variables → Actions):
 #   FIREBASE_SERVICE_ACCOUNT  JSON key of a service account with the "Firebase Admin" role
 #   VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID,
@@ -9,7 +9,7 @@ name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/attendance-app]
   workflow_dispatch:
 
 concurrency: deploy
