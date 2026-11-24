@@ -1,0 +1,85 @@
+{
+  "flow": "https://elevenlabs.io/app/flows/cBP7Yr4iaxvFZy7XiTd6",
+  "aspect": "16:9 source, cropped to 16:10",
+  "style": "Use: header illustration for a class card in a community-center attendance app. Medium: hand-painted gouache on textured paper, storybook illustration, visible brush strokes and soft paper grain. Composition: wide landscape scene, main subject centered with generous empty margins at top and bottom (the image will be cropped to a 16:10 band). Palette limited to deep flag blue (#1847a8), warm sand and Jerusalem-stone beige, one brick-red accent (#b5391d) and cream highlights; gentle warm daylight from the left; light airy background. Simple, confident shapes. Constraints: no text, no letters, no numbers, no logos; people are stylized, faceless or seen from a distance, no realistic faces.",
+  "images": {
+    "martial-arts": {
+      "generationId": "eA6HJIeeYxAi8zvrWrGB",
+      "label": "אומנויות לחימה",
+      "scene": "two young martial-arts students in white uniforms bowing to each other on a blue mat in a sunlit dojo hall with tall arched windows",
+      "keywords": ["לחימה", "קרב מגע", "ג׳ודו", "ג'ודו", "גודו", "קראטה", "טאקוונדו", "קפוארה", "הגנה עצמית", "אגרוף"]
+    },
+    "hairstyling": {
+      "generationId": "RwEYs0s2Dk1FfRaMGr6W",
+      "label": "תסרוקות",
+      "scene": "a cozy styling studio corner: a round mirror, combs, brushes, hair clips and a braided ponytail on a styling head, a teenage girl seen from behind braiding hair",
+      "keywords": ["תסרוק", "שיער", "צמות", "איפור", "קוסמטיקה", "ציפורניים"]
+    },
+    "zumba": {
+      "generationId": "b85hWsImwKRe8MH8RLdC",
+      "label": "זומבה וכושר",
+      "scene": "a joyful group of women and girls dancing a fitness class in a bright community hall, arms up mid-move, motion swirls",
+      "keywords": ["זומבה", "אירובי", "כושר", "פילאטיס", "יוגה", "התעמלות"]
+    },
+    "theatre": {
+      "generationId": "CWa70r6aax87SRFkqJm8",
+      "label": "תאטרון",
+      "scene": "a small community theatre stage with heavy blue curtains pulled open, warm spotlight on two young actors in simple costumes",
+      "keywords": ["תאטרון", "תיאטרון", "דרמה", "במה", "סטנדאפ"]
+    },
+    "art": {
+      "generationId": "LEAYkMhgpYX8zyolWEEC",
+      "label": "אומנות",
+      "scene": "an art-class table seen from above at a slight angle: paint jars, brushes, a palette and a half-finished painting of Acre sea walls",
+      "keywords": ["אומנות", "אמנות", "ציור", "יצירה", "קרמיקה", "פיסול", "רישום", "צילום"]
+    },
+    "jewish-dance": {
+      "generationId": "dmb29YVPSHUUhJvQ7Gla",
+      "label": "מחול",
+      "scene": "a circle of dancers holding hands in a joyful hora-style folk dance in a stone courtyard, skirts swirling",
+      "keywords": ["מחול", "ריקוד", "רוקדים", "בלט", "היפ הופ", "ג׳אז", "דבקה"]
+    },
+    "surfing": {
+      "generationId": "23a9zt4grA9IJaCN1Uhf",
+      "label": "גלישה",
+      "scene": "young surfers carrying boards toward gentle waves at a Mediterranean beach with old Acre sea walls in the distance",
+      "keywords": ["גלישה", "גלישת", "שחייה", "קייאק", "שייט"]
+    },
+    "chess": {
+      "generationId": "qRfxWGaSpdt7xI26EvDB",
+      "label": "שחמט",
+      "scene": "a chessboard mid-game on a wooden table by a window, two players seen from the shoulders down",
+      "keywords": ["שחמט", "שח-מט", "משחקי חשיבה", "בריג׳"]
+    },
+    "music": {
+      "generationId": "A0PXfhqCNAPkp6OaYzPH",
+      "label": "מוזיקה",
+      "scene": "a music room with an acoustic guitar, a darbuka drum, a keyboard and floating musical notes",
+      "keywords": ["מוזיקה", "מוסיקה", "גיטרה", "תופים", "פסנתר", "מקהלה", "שירה", "כינור", "אורגן", "דרבוקה"]
+    },
+    "sports": {
+      "generationId": "nn6RaChEMdBDzj6TI7nG",
+      "label": "ספורט",
+      "scene": "kids playing ball on an outdoor court at the neighbourhood community center, late afternoon light",
+      "keywords": ["כדור", "ספורט", "טניס", "אתלטיקה", "ריצה", "אופניים", "קטרגל"]
+    },
+    "cooking": {
+      "generationId": "aiTBwv1IuydJi7z74HXT",
+      "label": "בישול",
+      "scene": "a warm kitchen counter with fresh challah dough, bowls, flour, herbs and a rolling pin, hands kneading",
+      "keywords": ["בישול", "אפייה", "שף", "קונדיטוריה", "עוגות", "מטבח"]
+    },
+    "science": {
+      "generationId": "zpHlilTDWT24vHAjjLKm",
+      "label": "מדע",
+      "scene": "a science and robotics workshop table: a small wheeled robot, circuit parts, a magnifying glass and a globe",
+      "keywords": ["מדע", "רובוט", "מחשב", "תכנות", "מדעים", "אסטרונומיה"]
+    },
+    "community": {
+      "generationId": "GBFJlcKVpiBvsccsTNAE",
+      "label": "קהילה",
+      "scene": "a welcoming stone community-center building in Acre with arched doorway, potted plants and people of all ages walking in",
+      "keywords": []
+    }
+  }
+}

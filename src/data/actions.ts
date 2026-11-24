@@ -1,0 +1,186 @@
+import { useMemo } from 'react';
+import { today } from '../lib/dates';
+import { newId, normPhone } from '../lib/format';
+import { sessId } from '../lib/stats';
+import type { AttendanceRecord, Course, DataState, Mark, Role, Student } from '../lib/types';
+import { useToast } from '../ui/Toast';
+import { isPermissionError, type WriteOp } from './backend';
+import { useData } from './DataContext';
+
+const nowIso = () => new Date().toISOString();
+
+/**
+ * All writes go through here. Writes are not awaited by the UI: the Firestore cache shows
+ * them at once (also offline) and syncs later; failures surface as a toast.
+ */
+export function useActions() {
+  const { backend, S } = useData();
+  const toast = useToast();
+
+  return useMemo(() => {
+    const fail = (e: unknown) => {
+      console.error(e);
+      toast(isPermissionError(e) ? 'אין הרשאה לשמור – פנו למנהל/ת' : 'השמירה נכשלה, נסו שוב', { error: true });
+    };
+    const run = (p: Promise<void>) => {
+      p.catch(fail);
+      return p;
+    };
+
+    const sessionPatch = (courseId: string, date: string, records: Record<string, Partial<AttendanceRecord>>) => ({
+      courseId,
+      date,
+      records,
+      updatedAt: nowIso(),
+    });
+
+    const enrollOps = (S0: DataState, courseId: string, studentId: string): WriteOp => {
+      const id = `${courseId}_${studentId}`;
+      return S0.enrollments[id]
+        ? { type: 'merge', path: `enrollments/${id}`, data: { active: true, removedAt: null } }
+        : {
+            type: 'set',
+            path: `enrollments/${id}`,
+            data: { courseId, studentId, active: true, addedAt: today(), removedAt: null, group: '', info: '' },
+          };
+    };
+
+    return {
+      setMark: (courseId: string, date: string, sid: string, s: Mark) =>
+        run(backend.mergeDoc(`sessions/${sessId(courseId, date)}`, sessionPatch(courseId, date, { [sid]: { s } }))),
+
+      setNote: (courseId: string, date: string, sid: string, n: string) =>
+        run(
+          backend.mergeDoc(
+            `sessions/${sessId(courseId, date)}`,
+            sessionPatch(courseId, date, { [sid]: { n, t: n ? nowIso() : '' } }),
+          ),
+        ),
+
+      setRecord: (courseId: string, date: string, sid: string, rec: { s: Mark; n: string }) =>
+        run(
+          backend.mergeDoc(
+            `sessions/${sessId(courseId, date)}`,
+            sessionPatch(courseId, date, { [sid]: { ...rec, t: rec.n ? nowIso() : '' } }),
+          ),
+        ),
+
+      setMany: (courseId: string, date: string, recs: Record<string, { s: Mark }>) =>
+        run(backend.mergeDoc(`sessions/${sessId(courseId, date)}`, sessionPatch(courseId, date, recs))),
+
+      setSessionNote: (courseId: string, date: string, note: string) =>
+        run(
+          backend.mergeDoc(`sessions/${sessId(courseId, date)}`, {
+            courseId,
+            date,
+            note,
+            noteT: note ? nowIso() : '',
+            updatedAt: nowIso(),
+          }),
+        ),
+
+      deleteSession: (id: string) => run(backend.deleteDoc(`sessions/${id}`)),
+
+      saveCourse: (id: string | null, data: Omit<Course, 'order'>) => {
+        const cid = id || newId('c');
+        run(
+          id
+            ? backend.mergeDoc(`courses/${cid}`, { ...data })
+            : backend.setDoc(`courses/${cid}`, { ...data, order: Date.now() }),
+        );
+        return cid;
+      },
+
+      setCourseImage: (id: string, url: string) => run(backend.mergeDoc(`courses/${id}`, { image: url })),
+
+      saveStudent: (sid: string, data: Pick<Student, 'name' | 'mother' | 'phone' | 'age'>) =>
+        run(backend.mergeDoc(`students/${sid}`, { ...data, phone: normPhone(data.phone) })),
+
+      /** Create a student and enroll them; optionally mark them as arrived on `markDate`. */
+      createStudent: (
+        data: Pick<Student, 'name' | 'mother' | 'phone' | 'age'>,
+        courseId: string,
+        markDate?: string,
+      ) => {
+        const sid = newId('s');
+        const ops: WriteOp[] = [
+          {
+            type: 'set',
+            path: `students/${sid}`,
+            data: { ...data, phone: normPhone(data.phone), birthDate: '', createdAt: today() },
+          },
+          enrollOps(S, courseId, sid),
+        ];
+        if (markDate)
+          ops.push({
+            type: 'merge',
+            path: `sessions/${sessId(courseId, markDate)}`,
+            data: sessionPatch(courseId, markDate, { [sid]: { s: 'v' } }),
+          });
+        run(backend.batch(ops));
+        return sid;
+      },
+
+      enroll: (courseId: string, studentId: string) => run(backend.batch([enrollOps(S, courseId, studentId)])),
+      removeEnrollment: (eid: string) =>
+        run(backend.mergeDoc(`enrollments/${eid}`, { active: false, removedAt: today() })),
+      restoreEnrollment: (eid: string) =>
+        run(backend.mergeDoc(`enrollments/${eid}`, { active: true, removedAt: null })),
+
+      /**
+       * Move `moveSids` from course `src` into a new course, taking their past attendance and notes along.
+       * Ported from the original app's splitCourse.
+       */
+      splitCourse: (
+        src: string,
+        course: Pick<Course, 'name' | 'time' | 'day' | 'instructors'>,
+        moveSids: string[],
+        renameSrc?: string,
+      ) => {
+        const nid = newId('c');
+        const now = nowIso();
+        const moveSet = new Set(moveSids);
+        const ops: WriteOp[] = [
+          { type: 'set', path: `courses/${nid}`, data: { ...course, archived: false, order: Date.now() } },
+        ];
+        for (const sid of moveSids) {
+          const eid = `${src}_${sid}`;
+          const e = S.enrollments[eid];
+          if (!e) continue;
+          ops.push({ type: 'set', path: `enrollments/${nid}_${sid}`, data: { ...e, courseId: nid } });
+          ops.push({ type: 'delete', path: `enrollments/${eid}` });
+        }
+        for (const [id, se] of Object.entries(S.sessions)) {
+          if (se.courseId !== src) continue;
+          const moved: Record<string, AttendanceRecord> = {};
+          const kept: Record<string, AttendanceRecord> = {};
+          for (const [sid, r] of Object.entries(se.records || {})) (moveSet.has(sid) ? moved : kept)[sid] = r;
+          const has = Object.keys(moved).length > 0;
+          if (!has && !se.note) continue;
+          ops.push({
+            type: 'set',
+            path: `sessions/${sessId(nid, se.date)}`,
+            data: { courseId: nid, date: se.date, note: se.note || '', records: moved, updatedAt: now },
+          });
+          if (has) ops.push({ type: 'set', path: `sessions/${id}`, data: { ...se, records: kept, updatedAt: now } });
+        }
+        if (renameSrc) ops.push({ type: 'merge', path: `courses/${src}`, data: { name: renameSrc } });
+        return backend.batch(ops).then(
+          () => nid,
+          (e) => {
+            fail(e);
+            throw e;
+          },
+        );
+      },
+
+      invite: (email: string, role: Role, instructorName: string) =>
+        run(backend.setDoc(`invites/${email.trim().toLowerCase()}`, { role, instructorName, invitedAt: nowIso() })),
+      deleteInvite: (email: string) => run(backend.deleteDoc(`invites/${email}`)),
+      updateUser: (uid: string, data: { role?: Role; instructorName?: string }) =>
+        run(backend.mergeDoc(`users/${uid}`, data)),
+    };
+  }, [backend, S, toast]);
+}
+
+export type Actions = ReturnType<typeof useActions>;
