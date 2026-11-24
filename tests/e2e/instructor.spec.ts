@@ -64,6 +64,9 @@ test.describe('instructor', () => {
 
   test('moves between dates', async ({ page }) => {
     await open(page, '/course/c01');
+    // On phones the full date controls are folded behind a chip at the end of the recent dates.
+    const more = page.getByRole('button', { name: 'תאריך אחר' });
+    if (await more.isVisible()) await more.click();
     const date = page.getByLabel('תאריך המפגש');
     const start = await date.inputValue();
     await page.getByRole('button', { name: 'שבוע קודם' }).click();
@@ -71,6 +74,18 @@ test.describe('instructor', () => {
     expect(new Date(start).getTime() - new Date(prev).getTime()).toBe(7 * 864e5);
     await page.getByRole('button', { name: 'יום הבא' }).click();
     expect(new Date(await date.inputValue()).getTime() - new Date(prev).getTime()).toBe(864e5);
+  });
+
+  test('fits a student on one line on phones', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone layout only');
+    await open(page, '/course/c01');
+    // A row with a saved note also shows the note field, so measure one without.
+    const plain = rows(page)
+      .filter({ hasNot: page.getByRole('textbox') })
+      .first();
+    const box = await plain.boundingBox();
+    expect(box!.height).toBeLessThan(90);
+    await expect(page.getByLabel('תאריך המפגש')).toBeHidden();
   });
 
   test('old hash links still work', async ({ page }) => {

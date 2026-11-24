@@ -638,6 +638,14 @@ label.chk {
   color: inherit;
   opacity: 0.8;
 }
+.dchip.more {
+  border-style: dashed;
+}
+@media (min-width: 601px) {
+  .dchip.more {
+    display: none;
+  }
+}
 .sess {
   display: grid;
   gap: 18px;
@@ -1312,11 +1320,88 @@ tr.removed td.fix a {
     padding: 0 9px;
     font-size: 14px;
   }
-  .stu {
-    grid-template-columns: minmax(0, 1fr);
+  /* Marking screen: one line per student, icon-only buttons (labels stay for screen readers). */
+  .list {
+    gap: 6px;
   }
-  .marks .mk {
-    flex: 1;
+  .stu {
+    padding: 7px 12px 7px 8px;
+    gap: 6px 10px;
+    border-radius: 14px;
+  }
+  .stu .nm {
+    font-size: 17px;
+  }
+  .meta {
+    gap: 0 10px;
+    font-size: 13px;
+    margin-top: 0;
+  }
+  .meta .link {
+    min-height: 24px;
+    font-size: 13px;
+  }
+  .mk {
+    min-width: 0;
+    width: 50px;
+    min-height: 48px;
+    padding: 0;
+  }
+  .mk .i {
+    width: 24px;
+    height: 24px;
+  }
+  .mk.v:not(.on) {
+    color: var(--blue);
+  }
+  .mk.x:not(.on) {
+    color: var(--red);
+  }
+  .mk .lbl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sess-top {
+    margin-bottom: 10px;
+  }
+  .sess-head {
+    gap: 10px;
+  }
+  .sess-title {
+    gap: 4px;
+  }
+  .sess-head img.sess-art {
+    width: 76px;
+    border-radius: 12px;
+  }
+  .sfilter {
+    flex-wrap: nowrap;
+    margin-bottom: 8px;
+  }
+  .sfilter input {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .sfilter button {
+    flex: none;
+  }
+  .datebar {
+    gap: 6px;
+  }
+  .dnav.folded {
+    display: none;
+  }
+  .dchip {
+    min-width: 56px;
+    min-height: 46px;
+    padding: 4px 8px;
+  }
+  .dlabel {
+    font-size: 15px;
   }
   .dnav {
     display: grid;

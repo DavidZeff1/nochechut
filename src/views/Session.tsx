@@ -27,7 +27,18 @@ import { copyToClipboard, useToast } from '../ui/Toast';
 /** Date chosen per course during this visit, for undated links. */
 const rememberedDate: Record<string, string> = {};
 
-function DateChips({ cid, date, onPick }: { cid: string; date: string; onPick: (d: string) => void }) {
+function DateChips({
+  cid,
+  date,
+  onPick,
+  onMore,
+}: {
+  cid: string;
+  date: string;
+  onPick: (d: string) => void;
+  /** Shown on phones when the full date controls are folded away. */
+  onMore?: () => void;
+}) {
   const { S, X } = useData();
   const c = S.courses[cid];
   const t = today();
@@ -60,6 +71,12 @@ function DateChips({ cid, date, onPick }: { cid: string; date: string; onPick: (
           <small>{dm(d)}</small>
         </button>
       ))}
+      {onMore && (
+        <button className="dchip more" aria-label="תאריך אחר" onClick={onMore}>
+          <span>תאריך</span>
+          <small>אחר…</small>
+        </button>
+      )}
     </div>
   );
 }
@@ -162,6 +179,9 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
   const [adding, setAdding] = useState(false);
   const [noteDlg, setNoteDlg] = useState(false);
   const [copyText, setCopyText] = useState<string | null>(null);
+  // Instructors on a phone see only the recent-date chips until they ask for more.
+  const [moreDates, setMoreDates] = useState(false);
+  const foldDates = !admin && !moreDates;
   const c = S.courses[cid];
 
   const urlDate = ymd && /^\d{8}$/.test(ymd) ? fromCompact(ymd) : null;
@@ -262,7 +282,7 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
         </div>
       </div>
       <div className="datebar">
-        <div className="dnav">
+        <div className={`dnav ${foldDates ? 'folded' : ''}`}>
           <button
             className="ghost"
             aria-label="שבוע קודם"
@@ -282,7 +302,7 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
             «
           </button>
         </div>
-        <DateChips cid={cid} date={date} onPick={pickDate} />
+        <DateChips cid={cid} date={date} onPick={pickDate} onMore={foldDates ? () => setMoreDates(true) : undefined} />
         <p className="dlabel">
           {longDate(date)}
           {date === t ? ' · היום' : ''}
@@ -406,7 +426,7 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
                         onClick={() => mark(sid, 'v')}
                       >
                         <CheckIcon />
-                        הגיע/ה
+                        <span className="lbl">הגיע/ה</span>
                       </button>
                       <button
                         className={`mk x ${r.s === 'x' ? 'on' : ''}`}
@@ -415,7 +435,7 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
                         onClick={() => mark(sid, 'x')}
                       >
                         <CrossIcon />
-                        לא הגיע/ה
+                        <span className="lbl">לא הגיע/ה</span>
                       </button>
                     </div>
                     {showNote && <NoteInput cid={cid} date={date} sid={sid} value={r.n} disabled={readOnly} />}
