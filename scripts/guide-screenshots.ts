@@ -168,6 +168,12 @@ async function main() {
     await p.waitForTimeout(500);
     await shot(p, 'student');
 
+    p = await open(browser, 'admin', '/admin/instructors', false);
+    await btn(p, 'עריכת הטלפון של אלון').click();
+    await p.getByLabel('הטלפון של אלון').fill('0541234567');
+    await p.getByLabel('הטלפון של אלון').press('Enter');
+    await shot(p, 'instructors');
+
     p = await open(browser, 'admin', '/admin/settings', false);
     await shot(p, 'settings', { fullPage: true });
 

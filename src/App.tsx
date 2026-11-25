@@ -19,6 +19,7 @@ const CourseRegister = lazy(() => import('./views/admin/CourseRegister'));
 const Students = lazy(() => import('./views/admin/Students'));
 const StudentPage = lazy(() => import('./views/admin/StudentPage'));
 const Settings = lazy(() => import('./views/admin/Settings'));
+const Instructors = lazy(() => import('./views/admin/Instructors'));
 const Guide = lazy(() => import('./views/Guide'));
 
 function makeBackend(): Backend {
@@ -60,6 +61,7 @@ function Main() {
                 <Route path="/admin/students" element={<Students />} />
                 <Route path="/admin/student/:sid" element={<StudentPage />} />
                 <Route path="/admin/settings" element={<Settings />} />
+                <Route path="/admin/instructors" element={<Instructors />} />
               </>
             )}
             {!isAdmin && auth.status === 'ready' && (

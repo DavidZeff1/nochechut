@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../auth/AuthContext';
 import { useActions } from '../../data/actions';
 import { useData } from '../../data/DataContext';
+import { useCollection } from '../../data/useCollection';
 import { downloadText } from '../../lib/csv';
 import { today } from '../../lib/dates';
 import { allInstructors } from '../../lib/stats';
@@ -57,21 +58,6 @@ function RequestRow({ req, users, me }: { req: AccessRequest; users: Record<stri
       </div>
     </li>
   );
-}
-
-function useCollection<T>(col: string) {
-  const { backend } = useData();
-  const [docs, setDocs] = useState<Record<string, T>>({});
-  useEffect(
-    () =>
-      backend.watchCollection<T>(
-        col,
-        (s) => setDocs(s.docs),
-        () => setDocs({}),
-      ),
-    [backend, col],
-  );
-  return docs;
 }
 
 export default function Settings() {

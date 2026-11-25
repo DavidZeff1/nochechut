@@ -66,6 +66,7 @@ export function Header() {
                   מבט-על
                 </NavLink>
                 <NavLink to="/admin/students">תלמידים</NavLink>
+                <NavLink to="/admin/instructors">מדריכים</NavLink>
                 <NavLink
                   to="/admin/settings"
                   aria-label={pendingReqs ? `הגדרות, ${pendingReqs} בקשות גישה ממתינות` : undefined}
@@ -74,13 +75,13 @@ export function Header() {
                   {pendingReqs > 0 && <span className="navbadge">{pendingReqs}</span>}
                 </NavLink>
                 <NavLink to="/" end>
-                  מדריכים
+                  סימון נוכחות
                 </NavLink>
-                <Link to="/guide">מדריך</Link>
+                <Link to="/guide">עזרה</Link>
               </>
             ) : (
               <>
-                <Link to="/guide">מדריך</Link>
+                <Link to="/guide">עזרה</Link>
                 {auth.status === 'ready' && <RequestAdminButton backend={backend} user={auth.user} />}
                 {backend.kind === 'firebase' && (
                   <button className="navbtn" onClick={() => backend.signOut()}>

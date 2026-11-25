@@ -222,6 +222,43 @@ export function useActions() {
       declineRequest: (email: string, decidedBy: string) =>
         run(backend.mergeDoc(`accessRequests/${email}`, { status: 'declined', decidedAt: nowIso(), decidedBy })),
       deleteRequest: (email: string) => run(backend.deleteDoc(`accessRequests/${email}`)),
+
+      /** Instructor contact details live in config/app under `instructors`, keyed by the name used on courses. */
+      setInstructorPhone: (name: string, phone: string) =>
+        run(backend.mergeDoc('config/app', { instructors: { [name]: { phone: normPhone(phone) } } })),
+
+      /**
+       * Renames an instructor everywhere the name is used: on every course (also merging two
+       * spellings of the same person), on app accounts and invites, and in the contact details.
+       */
+      renameInstructor: (
+        from: string,
+        to: string,
+        users: Record<string, UserProfile>,
+        invites: Record<string, { instructorName?: string; role: Role }>,
+      ) => {
+        const name = to.trim();
+        if (!name || name === from) return Promise.resolve();
+        const ops: WriteOp[] = [];
+        for (const [cid, c] of Object.entries(S.courses)) {
+          if (!c?.instructors?.includes(from)) continue;
+          const next = [...new Set(c.instructors.map((n) => (n === from ? name : n)))];
+          ops.push({ type: 'merge', path: `courses/${cid}`, data: { instructors: next } });
+        }
+        for (const [uid, u] of Object.entries(users))
+          if (u.instructorName === from)
+            ops.push({ type: 'merge', path: `users/${uid}`, data: { instructorName: name } });
+        for (const [em, inv] of Object.entries(invites))
+          if (inv.instructorName === from)
+            ops.push({ type: 'merge', path: `invites/${em}`, data: { instructorName: name } });
+        const contacts = (S.config.instructors || {}) as Record<string, { phone?: string }>;
+        if (contacts[from]) {
+          const merged = { ...contacts, [name]: { ...contacts[from], ...contacts[name] } };
+          delete merged[from];
+          ops.push({ type: 'set', path: 'config/app', data: { ...S.config, instructors: merged } });
+        }
+        return run(backend.batch(ops));
+      },
     };
   }, [backend, S, toast]);
 }
