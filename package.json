@@ -18,7 +18,8 @@
     "seed:emulator": "tsx scripts/seed-emulator.ts",
     "import": "tsx scripts/import.ts",
     "images": "tsx scripts/process-images.ts",
-    "add-user": "tsx scripts/add-user.ts"
+    "add-user": "tsx scripts/add-user.ts",
+    "guide:shots": "tsx scripts/guide-screenshots.ts"
   },
   "dependencies": {
     "firebase": "^13.4.0",

@@ -26,7 +26,14 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         globPatterns: ['**/*.{js,css,html,webp,png,svg,woff2}'],
+        // The guide's screenshots load when the guide is opened, not with the app install.
+        globIgnores: ['guide/**'],
         runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/guide/'),
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'guide', expiration: { maxEntries: 40 } },
+          },
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
             handler: 'CacheFirst',
