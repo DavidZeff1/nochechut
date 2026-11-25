@@ -2090,3 +2090,75 @@ details summary {
 .iaccess .tag {
   white-space: normal;
 }
+
+/* ---------- avatars & instructor profiles ---------- */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.inames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+.iname {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.icard-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.icard-title {
+  flex: 1;
+  min-width: 0;
+}
+.icontact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.iedit {
+  display: grid;
+  gap: 12px;
+}
+.photopick {
+  display: grid;
+  gap: 10px;
+}
+.photopick-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.photopick-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--panel2);
+}
+.photopick-btns {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.photopick-sliders {
+  display: grid;
+  gap: 6px;
+}
+.crop-slider input {
+  padding: 0;
+  min-height: 28px;
+  accent-color: var(--blue);
+}

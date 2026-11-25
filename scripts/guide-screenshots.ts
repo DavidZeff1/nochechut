@@ -6,7 +6,7 @@
  *   CHROME_PATH=/path/to/chrome npm run guide:shots
  */
 import { spawn, execSync } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, type Browser, type Page } from '@playwright/test';
 import sharp from 'sharp';
@@ -168,11 +168,30 @@ async function main() {
     await p.waitForTimeout(500);
     await shot(p, 'student');
 
+    // Demo "photos" are course illustrations, so no real person appears in the guide.
+    const photo = (file: string) => ({
+      name: 'photo.webp',
+      mimeType: 'image/webp',
+      buffer: readFileSync(join('public', 'courses', file)),
+    });
+    const fillProfile = async (page: Page, name: string, file: string, phone: string) => {
+      await btn(page, `עריכת הפרטים של ${name}`).click();
+      const d = page.getByRole('dialog');
+      await d.getByLabel('קובץ תמונה').setInputFiles(photo(file));
+      await d.getByLabel('הגדלה').fill('1.6');
+      await d.getByLabel('טלפון').fill(phone);
+    };
     p = await open(browser, 'admin', '/admin/instructors', false);
-    await btn(p, 'עריכת הטלפון של אלון').click();
-    await p.getByLabel('הטלפון של אלון').fill('0541234567');
-    await p.getByLabel('הטלפון של אלון').press('Enter');
+    await fillProfile(p, 'שרית', 'martial-arts-800.webp', '0541234567');
+    await p.getByRole('dialog').getByRole('button', { name: 'שמירה' }).click();
+    await fillProfile(p, 'אלון', 'surfing-800.webp', '0527654321');
+    await p.getByRole('dialog').getByRole('button', { name: 'שמירה' }).click();
     await shot(p, 'instructors');
+
+    p = await open(browser, 'admin', '/admin/instructors', false);
+    await fillProfile(p, 'מיכל', 'theatre-800.webp', '0501112233');
+    await p.getByRole('dialog').getByLabel('מייל').fill('michal@example.com');
+    await shot(p, 'instructor-edit');
 
     p = await open(browser, 'admin', '/admin/settings', false);
     await shot(p, 'settings', { fullPage: true });

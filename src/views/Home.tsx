@@ -5,6 +5,7 @@ import { useData } from '../data/DataContext';
 import { DAYS, dm, longDate, parseISO, today } from '../lib/dates';
 import { activeCourses, allInstructors, countMarks, courseStats, getRecord, rosterFor, sessId } from '../lib/stats';
 import type { CourseWithId } from '../lib/types';
+import { InstructorNames } from '../ui/Avatar';
 import { CourseImage } from '../ui/CourseImage';
 
 const ME_KEY = 'instructor';
@@ -38,7 +39,7 @@ function TodayCard({ c }: { c: CourseWithId }) {
           <span>{n} תלמידים</span>
         </span>
         <b>{c.name}</b>
-        {c.instructors?.length > 0 && <span>{c.instructors.join(', ')}</span>}
+        {c.instructors?.length > 0 && <InstructorNames names={c.instructors} />}
         <span className="tb">
           <i style={{ width: `${n ? Math.round((100 * done) / n) : 0}%` }} />
         </span>
@@ -63,9 +64,8 @@ function CourseCard({ c }: { c: CourseWithId }) {
           <b>{c.name}</b>
           {c.time && <span className="time">{c.time}</span>}
         </span>
-        <span className="muted small">
-          {st.active} תלמידים{c.instructors?.length ? ` · ${c.instructors.join(', ')}` : ''}
-        </span>
+        <span className="muted small">{st.active} תלמידים</span>
+        {c.instructors?.length > 0 && <InstructorNames names={c.instructors} size={20} />}
         <span className="small">{st.last ? `מפגש אחרון ${dm(st.last)} · ${lastV} הגיעו` : 'עוד לא נרשמה נוכחות'}</span>
       </span>
     </Link>

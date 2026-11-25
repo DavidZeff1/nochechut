@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import { today } from '../lib/dates';
 import { newId, normPhone } from '../lib/format';
+import { instructorId } from '../lib/instructors';
 import { sessId } from '../lib/stats';
 import type {
   AccessRequest,
   AttendanceRecord,
   Course,
   DataState,
+  InstructorProfile,
   Mark,
   Role,
   Student,
@@ -34,6 +36,40 @@ export function useActions() {
     const run = (p: Promise<void>) => {
       p.catch(fail);
       return p;
+    };
+
+    /** Writes that rename an instructor on courses, accounts and invites, and move their profile. */
+    const renameOps = (
+      from: string,
+      name: string,
+      users: Record<string, UserProfile>,
+      invites: Record<string, { instructorName?: string; role: Role }>,
+    ): WriteOp[] => {
+      const ops: WriteOp[] = [];
+      for (const [cid, c] of Object.entries(S.courses)) {
+        if (!c?.instructors?.includes(from)) continue;
+        const next = [...new Set(c.instructors.map((n) => (n === from ? name : n)))];
+        ops.push({ type: 'merge', path: `courses/${cid}`, data: { instructors: next } });
+      }
+      for (const [uid, u] of Object.entries(users))
+        if (u.instructorName === from)
+          ops.push({ type: 'merge', path: `users/${uid}`, data: { instructorName: name } });
+      for (const [em, inv] of Object.entries(invites))
+        if (inv.instructorName === from)
+          ops.push({ type: 'merge', path: `invites/${em}`, data: { instructorName: name } });
+      const old = S.instructors[instructorId(from)];
+      if (old) {
+        const into = S.instructors[instructorId(name)];
+        // Keep what the target already has; fill the gaps from the old profile.
+        const merged: InstructorProfile = {
+          ...old,
+          ...Object.fromEntries(Object.entries(into || {}).filter(([, v]) => v)),
+          name,
+        };
+        ops.push({ type: 'delete', path: `instructors/${instructorId(from)}` });
+        ops.push({ type: 'set', path: `instructors/${instructorId(name)}`, data: { ...merged, updatedAt: nowIso() } });
+      }
+      return ops;
     };
 
     const sessionPatch = (courseId: string, date: string, records: Record<string, Partial<AttendanceRecord>>) => ({
@@ -223,14 +259,37 @@ export function useActions() {
         run(backend.mergeDoc(`accessRequests/${email}`, { status: 'declined', decidedAt: nowIso(), decidedBy })),
       deleteRequest: (email: string) => run(backend.deleteDoc(`accessRequests/${email}`)),
 
-      /** Instructor contact details live in config/app under `instructors`, keyed by the name used on courses. */
-      setInstructorPhone: (name: string, phone: string) =>
-        run(backend.mergeDoc('config/app', { instructors: { [name]: { phone: normPhone(phone) } } })),
-
       /**
-       * Renames an instructor everywhere the name is used: on every course (also merging two
-       * spellings of the same person), on app accounts and invites, and in the contact details.
+       * Creates or updates an instructor's profile (instructors/{id}). Changing the name also
+       * renames them on every course, account and invite, and merges into an existing profile
+       * when the new name is already used (two spellings of one person).
        */
+      saveInstructor: (
+        oldName: string | null,
+        data: { name: string; phone: string; email: string; photo: string },
+        users: Record<string, UserProfile>,
+        invites: Record<string, { instructorName?: string; role: Role }>,
+      ) => {
+        const name = data.name.trim();
+        if (!name) return Promise.resolve();
+        const ops: WriteOp[] = oldName && oldName !== name ? renameOps(oldName, name, users, invites) : [];
+        const existing = S.instructors[instructorId(name)];
+        const profile: InstructorProfile = {
+          ...(existing || {}),
+          name,
+          phone: normPhone(data.phone),
+          email: data.email.trim().toLowerCase(),
+          photo: data.photo,
+          updatedAt: nowIso(),
+        };
+        // Drop the moved profile, then write the new one (set after delete, so a rename onto
+        // an existing name keeps the merged details).
+        ops.push({ type: 'set', path: `instructors/${instructorId(name)}`, data: { ...profile } });
+        return run(backend.batch(ops));
+      },
+      deleteInstructorProfile: (name: string) => run(backend.deleteDoc(`instructors/${instructorId(name)}`)),
+
+      /** Renames an instructor everywhere (courses, accounts, invites, profile), merging two spellings. */
       renameInstructor: (
         from: string,
         to: string,
@@ -239,25 +298,7 @@ export function useActions() {
       ) => {
         const name = to.trim();
         if (!name || name === from) return Promise.resolve();
-        const ops: WriteOp[] = [];
-        for (const [cid, c] of Object.entries(S.courses)) {
-          if (!c?.instructors?.includes(from)) continue;
-          const next = [...new Set(c.instructors.map((n) => (n === from ? name : n)))];
-          ops.push({ type: 'merge', path: `courses/${cid}`, data: { instructors: next } });
-        }
-        for (const [uid, u] of Object.entries(users))
-          if (u.instructorName === from)
-            ops.push({ type: 'merge', path: `users/${uid}`, data: { instructorName: name } });
-        for (const [em, inv] of Object.entries(invites))
-          if (inv.instructorName === from)
-            ops.push({ type: 'merge', path: `invites/${em}`, data: { instructorName: name } });
-        const contacts = (S.config.instructors || {}) as Record<string, { phone?: string }>;
-        if (contacts[from]) {
-          const merged = { ...contacts, [name]: { ...contacts[from], ...contacts[name] } };
-          delete merged[from];
-          ops.push({ type: 'set', path: 'config/app', data: { ...S.config, instructors: merged } });
-        }
-        return run(backend.batch(ops));
+        return run(backend.batch(renameOps(from, name, users, invites)));
       },
     };
   }, [backend, S, toast]);

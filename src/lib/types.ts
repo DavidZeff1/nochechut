@@ -81,11 +81,25 @@ export interface AccessRequest {
   decidedBy?: string;
 }
 
+/**
+ * instructors/{id}: contact details and photo for an instructor, keyed by instructorId(name).
+ * The name is the one used on courses (Course.instructors).
+ */
+export interface InstructorProfile {
+  name: string;
+  phone?: string;
+  email?: string;
+  /** A small square JPEG as a data URL (about 20 KB), made in the browser. */
+  photo?: string;
+  updatedAt?: string;
+}
+
 export interface DataState {
   courses: Record<string, Course>;
   students: Record<string, Student>;
   enrollments: Record<string, Enrollment>;
   sessions: Record<string, Session>;
+  instructors: Record<string, InstructorProfile>;
   config: AppConfig;
 }
 

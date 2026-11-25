@@ -35,6 +35,11 @@ service cloud.firestore {
       allow read: if isStaff();
       allow write: if isAdmin();
     }
+    // Instructor contact details and photos; staff see them on course cards.
+    match /instructors/{id} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
     match /users/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       // First sign-in: copy your own invite into your profile, with the invited role only.

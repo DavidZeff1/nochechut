@@ -104,6 +104,7 @@ describe('stats', () => {
       c1_20261117: { courseId: 'c1', date: '2026-11-17', records: { a: { s: 'v', n: '' }, b: { s: '', n: 'איחר' } } },
       c1_20261124: { courseId: 'c1', date: '2026-11-24', records: { a: { s: 'x', n: '' } } },
     },
+    instructors: {},
     config: {},
   } as DataState;
   const X = buildIndex(S);

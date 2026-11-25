@@ -3,8 +3,8 @@ import { buildIndex } from '../lib/stats';
 import type { DataIndex, DataState } from '../lib/types';
 import type { Backend } from './backend';
 
-type Col = 'courses' | 'students' | 'enrollments' | 'sessions';
-const COLS: Col[] = ['courses', 'students', 'enrollments', 'sessions'];
+type Col = 'courses' | 'students' | 'enrollments' | 'sessions' | 'instructors';
+const COLS: Col[] = ['courses', 'students', 'enrollments', 'sessions', 'instructors'];
 
 export interface DataContextValue {
   S: DataState;
@@ -18,7 +18,7 @@ export interface DataContextValue {
 
 const Ctx = createContext<DataContextValue | null>(null);
 
-const EMPTY: DataState = { courses: {}, students: {}, enrollments: {}, sessions: {}, config: {} };
+const EMPTY: DataState = { courses: {}, students: {}, enrollments: {}, sessions: {}, instructors: {}, config: {} };
 
 export function DataProvider({ backend, children }: { backend: Backend; children: ReactNode }) {
   const [S, setS] = useState<DataState>(EMPTY);
