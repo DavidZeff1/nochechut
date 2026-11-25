@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 export function Modal({ title, onClose, children }: { title: ReactNode; onClose: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -15,13 +16,15 @@ export function Modal({ title, onClose, children }: { title: ReactNode; onClose:
       prev?.focus?.({ preventScroll: true });
     };
   }, [onClose]);
-  return (
+  // Rendered at the end of <body>, so a dialog opened from the header does not inherit its styles.
+  return createPortal(
     <div className="scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="dlg" role="dialog" aria-modal="true" ref={ref}>
         <h3>{title}</h3>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

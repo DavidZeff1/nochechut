@@ -1,5 +1,4 @@
-import type { Role } from '../lib/types';
-import type { AuthUser, Backend, DocData } from './backend';
+import type { AuthUser, Backend, DemoView, DocData } from './backend';
 import { demoSeed } from './demoSeed';
 
 const STORE_KEY = 'demo-db-v1';
@@ -33,7 +32,7 @@ export function createMemoryBackend(opts: { seed?: Store; persist?: boolean } = 
   }
   const listeners = new Set<() => void>();
   const authListeners = new Set<(u: AuthUser | null) => void>();
-  let role: Role = ((typeof localStorage !== 'undefined' && localStorage.getItem(ROLE_KEY)) as Role) || 'admin';
+  let role: DemoView = ((typeof localStorage !== 'undefined' && localStorage.getItem(ROLE_KEY)) as DemoView) || 'admin';
 
   const save = () => {
     if (!persist) return;
@@ -55,12 +54,19 @@ export function createMemoryBackend(opts: { seed?: Store; persist?: boolean } = 
     }
     return docs;
   };
-  const demoUser = (): AuthUser => ({
-    uid: `demo-${role}`,
-    email: `${role}@demo.local`,
-    displayName: role === 'admin' ? 'מנהלת (הדגמה)' : 'שרית',
-  });
+  // 'noAccess' is a signed-in guest with no profile and no invite.
+  const demoUser = (): AuthUser | null =>
+    role === 'signedOut'
+      ? null
+      : role === 'noAccess'
+        ? { uid: 'demo-guest', email: 'guest@demo.local', displayName: 'אורחת (הדגמה)' }
+        : {
+            uid: `demo-${role}`,
+            email: `${role}@demo.local`,
+            displayName: role === 'admin' ? 'מנהלת (הדגמה)' : 'שרית',
+          };
   const ensureProfile = () => {
+    if (role !== 'admin' && role !== 'instructor') return;
     store[`users/demo-${role}`] = {
       role,
       email: `${role}@demo.local`,
@@ -68,6 +74,18 @@ export function createMemoryBackend(opts: { seed?: Store; persist?: boolean } = 
     };
   };
   ensureProfile();
+
+  const switchView = (next: DemoView) => {
+    role = next;
+    try {
+      localStorage.setItem(ROLE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+    ensureProfile();
+    emit();
+    authListeners.forEach((cb) => cb(demoUser()));
+  };
 
   return {
     kind: 'memory',
@@ -119,22 +137,16 @@ export function createMemoryBackend(opts: { seed?: Store; persist?: boolean } = 
       queueMicrotask(() => cb(demoUser()));
       return () => authListeners.delete(cb);
     },
-    async signInWithGoogle() {},
+    async signInWithGoogle() {
+      switchView('admin');
+    },
     async sendSignInLink() {},
     async completeSignInLink() {
       return false;
     },
-    async signOut() {},
-    setDemoRole(next) {
-      role = next;
-      try {
-        localStorage.setItem(ROLE_KEY, next);
-      } catch {
-        /* ignore */
-      }
-      ensureProfile();
-      emit();
-      authListeners.forEach((cb) => cb(demoUser()));
+    async signOut() {
+      switchView('signedOut');
     },
+    setDemoRole: switchView,
   };
 }

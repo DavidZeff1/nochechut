@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { AdminOnly } from './auth/AccessRequest';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { NoAccess, SignIn } from './auth/SignIn';
 import type { Backend } from './data/backend';
@@ -18,6 +19,7 @@ const CourseRegister = lazy(() => import('./views/admin/CourseRegister'));
 const Students = lazy(() => import('./views/admin/Students'));
 const StudentPage = lazy(() => import('./views/admin/StudentPage'));
 const Settings = lazy(() => import('./views/admin/Settings'));
+const Guide = lazy(() => import('./views/Guide'));
 
 function makeBackend(): Backend {
   return import.meta.env.VITE_BACKEND === 'memory' ? createMemoryBackend() : createFirebaseBackend();
@@ -37,7 +39,7 @@ function LegacyRedirect() {
 }
 
 function Main() {
-  const { loaded, error } = useData();
+  const { loaded, error, backend } = useData();
   const auth = useAuth();
   const isAdmin = auth.status === 'ready' && auth.profile.role === 'admin';
   return (
@@ -60,6 +62,9 @@ function Main() {
                 <Route path="/admin/settings" element={<Settings />} />
               </>
             )}
+            {!isAdmin && auth.status === 'ready' && (
+              <Route path="/admin/*" element={<AdminOnly backend={backend} user={auth.user} />} />
+            )}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
@@ -70,9 +75,17 @@ function Main() {
 
 function Gate({ backend }: { backend: Backend }) {
   const auth = useAuth();
+  const loc = useLocation();
+  // The guide is open to everyone, signed in or not.
+  if (loc.pathname === '/guide')
+    return (
+      <Suspense fallback={<div className="empty">טוען…</div>}>
+        <Guide />
+      </Suspense>
+    );
   if (auth.status === 'loading') return <div className="empty">טוען…</div>;
   if (auth.status === 'signedOut') return <SignIn backend={backend} />;
-  if (auth.status === 'noAccess') return <NoAccess email={auth.user.email} onSignOut={() => backend.signOut()} />;
+  if (auth.status === 'noAccess') return <NoAccess backend={backend} user={auth.user} />;
   return (
     <DataProvider backend={backend}>
       <Header />

@@ -64,6 +64,23 @@ export interface Invite {
   invitedAt?: string;
 }
 
+/**
+ * accessRequests/{email}: someone asking for access (not invited yet) or an instructor asking
+ * to become an admin. Admins see these in Settings and approve or decline them.
+ */
+export interface AccessRequest {
+  email: string;
+  uid: string;
+  name: string;
+  role: Role;
+  instructorName?: string;
+  note?: string;
+  status: 'pending' | 'approved' | 'declined';
+  createdAt: string;
+  decidedAt?: string;
+  decidedBy?: string;
+}
+
 export interface DataState {
   courses: Record<string, Course>;
   students: Record<string, Student>;

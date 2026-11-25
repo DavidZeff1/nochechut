@@ -1787,3 +1787,258 @@ details summary {
     min-height: 240px;
   }
 }
+
+/* ---------- access requests ---------- */
+.navbadge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  margin-inline-start: 6px;
+  border-radius: 99px;
+  background: #ff6b4a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+.reqs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.req {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.req-who {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+.req-note {
+  margin-top: 6px;
+  background: var(--bronze-soft);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+.req-act {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.req-act select {
+  width: auto;
+}
+.reqs.done li {
+  padding: 4px 0;
+}
+.reqform {
+  display: grid;
+  gap: 10px;
+  text-align: start;
+}
+.reqstatus {
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: start;
+  font-size: 15px;
+}
+.reqstatus.pending {
+  background: var(--blue-soft);
+}
+.reqstatus.declined {
+  background: var(--red-soft);
+}
+.adminonly {
+  max-width: 560px;
+  margin: 24px auto;
+  display: grid;
+  gap: 14px;
+}
+.adminonly h1 {
+  font-size: 26px;
+}
+.signin-demo {
+  margin-top: 14px;
+  justify-content: center;
+}
+@media (max-width: 600px) {
+  .top nav .navbtn {
+    padding: 0 8px;
+    font-size: 14px;
+  }
+}
+
+/* ---------- guide ---------- */
+.guide {
+  min-height: 100svh;
+  background: var(--bg);
+}
+.ghead {
+  background: var(--band);
+  color: #fff;
+}
+.ghead-in {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px max(4vw, 16px);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.ghead-in img {
+  height: 48px;
+  width: auto;
+  border-radius: 8px;
+  background: #fff;
+}
+.ghead-in h1 {
+  font-size: clamp(22px, 4vw, 30px);
+  color: #fff;
+}
+.ghead-in p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 14px;
+}
+.ghead-in .btn {
+  margin-inline-start: auto;
+  background: #fff;
+  color: #1847a8;
+  border-color: #fff;
+}
+.gbody {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px max(4vw, 16px) 60px;
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 900px) {
+  .gbody {
+    grid-template-columns: 240px minmax(0, 1fr);
+    align-items: start;
+  }
+  .gtoc {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100svh - 32px);
+    overflow: auto;
+  }
+}
+.gtoc {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 15px;
+}
+.gtoc ol {
+  margin: 6px 0 0;
+  padding-inline-start: 18px;
+  display: grid;
+  gap: 3px;
+}
+.gtoc ol ol {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.gtoc a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.gtoc a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.gmain {
+  min-width: 0;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.gmain h2 {
+  font-size: clamp(24px, 4vw, 30px);
+  margin: 34px 0 6px;
+  padding-top: 10px;
+  border-top: 2px solid var(--line);
+  scroll-margin-top: 16px;
+}
+.gmain h2:first-of-type {
+  border-top: 0;
+  margin-top: 10px;
+}
+.glead {
+  font-size: 18px;
+  background: var(--blue-soft);
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+.gstep {
+  margin: 22px 0;
+  scroll-margin-top: 16px;
+}
+.gstep h3 {
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+.gstep ol,
+.gstep ul {
+  padding-inline-start: 22px;
+  display: grid;
+  gap: 4px;
+}
+.gtip {
+  background: var(--bronze-soft);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 15px;
+}
+.gtip::before {
+  content: '💡 ';
+}
+.gshot {
+  margin: 14px 0;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+.gshot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 34px -22px var(--sh);
+  background: var(--panel);
+}
+.gshot.phone img {
+  max-width: 340px;
+  border-radius: 26px;
+  border: 6px solid #1d2433;
+}
+.gshot figcaption {
+  font-size: 14px;
+  color: var(--mute);
+  text-align: center;
+}
+.gfaq dt {
+  font-weight: 700;
+  margin-top: 12px;
+}
+.gfaq dd {
+  margin: 2px 0 0;
+}
+.gend {
+  margin-top: 30px;
+}

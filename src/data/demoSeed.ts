@@ -91,5 +91,16 @@ export function demoSeed(ref = today()): Record<string, DocData> {
     }
   });
   out['config/app'] = { plan_split_2026_11_22: true };
+  // One waiting access request, so the admin's Settings screen shows how approving works.
+  out['accessRequests/noa.demo@example.com'] = {
+    email: 'noa.demo@example.com',
+    uid: 'demo-noa',
+    name: 'נועה (הדגמה)',
+    role: 'instructor',
+    instructorName: 'נועה',
+    note: 'מדריכה חדשה בחוג קרמיקה',
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
   return out;
 }

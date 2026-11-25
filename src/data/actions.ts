@@ -2,7 +2,16 @@ import { useMemo } from 'react';
 import { today } from '../lib/dates';
 import { newId, normPhone } from '../lib/format';
 import { sessId } from '../lib/stats';
-import type { AttendanceRecord, Course, DataState, Mark, Role, Student } from '../lib/types';
+import type {
+  AccessRequest,
+  AttendanceRecord,
+  Course,
+  DataState,
+  Mark,
+  Role,
+  Student,
+  UserProfile,
+} from '../lib/types';
 import { useToast } from '../ui/Toast';
 import { isPermissionError, type WriteOp } from './backend';
 import { useData } from './DataContext';
@@ -179,6 +188,40 @@ export function useActions() {
       deleteInvite: (email: string) => run(backend.deleteDoc(`invites/${email}`)),
       updateUser: (uid: string, data: { role?: Role; instructorName?: string }) =>
         run(backend.mergeDoc(`users/${uid}`, data)),
+
+      /**
+       * Approves an access request with the given role. Someone who already has a profile (an
+       * instructor asking to be an admin) gets the new role at once; anyone else gets an invite,
+       * which their open "no access" screen picks up by itself.
+       */
+      approveRequest: (
+        req: AccessRequest,
+        role: Role,
+        instructorName: string,
+        users: Record<string, UserProfile>,
+        decidedBy: string,
+      ) => {
+        const email = req.email.trim().toLowerCase();
+        const uid = Object.entries(users).find(([, u]) => u.email?.toLowerCase() === email)?.[0];
+        const ops: WriteOp[] = [
+          uid
+            ? {
+                type: 'merge',
+                path: `users/${uid}`,
+                data: instructorName ? { role, instructorName } : { role },
+              }
+            : { type: 'set', path: `invites/${email}`, data: { role, instructorName, invitedAt: nowIso() } },
+          {
+            type: 'merge',
+            path: `accessRequests/${email}`,
+            data: { status: 'approved', role, decidedAt: nowIso(), decidedBy },
+          },
+        ];
+        return run(backend.batch(ops));
+      },
+      declineRequest: (email: string, decidedBy: string) =>
+        run(backend.mergeDoc(`accessRequests/${email}`, { status: 'declined', decidedAt: nowIso(), decidedBy })),
+      deleteRequest: (email: string) => run(backend.deleteDoc(`accessRequests/${email}`)),
     };
   }, [backend, S, toast]);
 }

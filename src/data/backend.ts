@@ -43,9 +43,11 @@ export interface Backend {
   sendSignInLink(email: string): Promise<void>;
   completeSignInLink(): Promise<boolean>;
   signOut(): Promise<void>;
-  /** Demo only: switch between the admin and instructor views. */
-  setDemoRole?(role: Role): void;
+  /** Demo only: switch between the admin and instructor views, or the screens before access. */
+  setDemoRole?(view: DemoView): void;
 }
+
+export type DemoView = Role | 'signedOut' | 'noAccess';
 
 export const isPermissionError = (e: unknown) =>
   typeof e === 'object' && e !== null && 'code' in e && String((e as { code: unknown }).code).includes('permission');

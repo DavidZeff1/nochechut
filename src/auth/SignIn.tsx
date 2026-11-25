@@ -1,5 +1,29 @@
 import { useEffect, useState } from 'react';
-import type { Backend } from '../data/backend';
+import { Link } from 'react-router-dom';
+import type { AuthUser, Backend, DemoView } from '../data/backend';
+import type { Invite } from '../lib/types';
+import { RequestAccessForm } from './AccessRequest';
+
+/** Demo build only: switch views from the screens that have no header. */
+export function DemoSwitch({ backend, value }: { backend: Backend; value: DemoView }) {
+  if (!backend.setDemoRole) return null;
+  return (
+    <div className="demo-bar signin-demo">
+      <span>מצב הדגמה</span>
+      <select
+        className="demo-role"
+        aria-label="תצוגת הדגמה"
+        value={value}
+        onChange={(e) => backend.setDemoRole?.(e.target.value as DemoView)}
+      >
+        <option value="admin">תצוגת מנהל/ת</option>
+        <option value="instructor">תצוגת מדריך/ה</option>
+        <option value="signedOut">מסך כניסה</option>
+        <option value="noAccess">חשבון בלי הרשאה</option>
+      </select>
+    </div>
+  );
+}
 
 export function SignIn({ backend }: { backend: Backend }) {
   const [email, setEmail] = useState('');
@@ -69,25 +93,47 @@ export function SignIn({ backend }: { backend: Backend }) {
             {msg}
           </p>
         )}
+        <Link className="small" to="/guide">
+          איך משתמשים באפליקציה? למדריך המלא
+        </Link>
       </div>
+      <DemoSwitch backend={backend} value="signedOut" />
     </div>
   );
 }
 
-export function NoAccess({ email, onSignOut }: { email: string; onSignOut: () => void }) {
+export function NoAccess({ backend, user }: { backend: Backend; user: AuthUser }) {
+  // Once an admin approves, an invite appears for this email; reload so the first-sign-in
+  // step turns it into a profile. Only when it appears while waiting here: if one was already
+  // there, claiming it failed for another reason and reloading would loop.
+  useEffect(() => {
+    let first = true;
+    return backend.watchDoc<Invite>(
+      `invites/${user.email.trim().toLowerCase()}`,
+      (inv) => {
+        if (inv && !first) window.location.reload();
+        first = false;
+      },
+      () => {},
+    );
+  }, [backend, user.email]);
   return (
     <div className="signin">
       <div className="panel signin-card">
         <img src="/logo.webp" alt="" className="signin-logo" />
         <h1>אין עדיין הרשאה</h1>
         <p>
-          החשבון <b dir="ltr">{email}</b> עוד לא הוזמן לאפליקציה. בקשו מהמנהל/ת להוסיף אתכם במסך ההגדרות, ואז היכנסו
-          שוב.
+          החשבון <b dir="ltr">{user.email}</b> עוד לא הוזמן לאפליקציה. אפשר לבקש גישה כאן, והבקשה תגיע למנהלים.
         </p>
-        <button className="ghost" onClick={onSignOut}>
+        <RequestAccessForm backend={backend} user={user} />
+        <button className="ghost" onClick={() => backend.signOut()}>
           יציאה והחלפת חשבון
         </button>
+        <Link className="small" to="/guide">
+          איך משתמשים באפליקציה? למדריך המלא
+        </Link>
       </div>
+      <DemoSwitch backend={backend} value="noAccess" />
     </div>
   );
 }
