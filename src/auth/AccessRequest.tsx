@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { AuthUser, Backend } from '../data/backend';
 import type { AccessRequest, Role } from '../lib/types';
-import { Modal } from '../ui/Modal';
 import { requestPath, useMyRequest } from './requests';
 
 const ROLE_LABEL: Record<Role, string> = { admin: 'מנהל/ת', instructor: 'מדריך/ה' };
@@ -133,30 +132,5 @@ export function AdminOnly({ backend, user }: { backend: Backend; user: AuthUser 
         → חזרה לחוגים
       </Link>
     </div>
-  );
-}
-
-/** Header button for instructors: ask to become an admin. */
-export function RequestAdminButton({ backend, user }: { backend: Backend; user: AuthUser }) {
-  const [open, setOpen] = useState(false);
-  const req = useMyRequest(backend, user.email);
-  const waiting = req?.status === 'pending' && req.role === 'admin';
-  return (
-    <>
-      <button className="navbtn" onClick={() => setOpen(true)}>
-        {waiting ? 'בקשה ממתינה' : 'בקשת הרשאת מנהל/ת'}
-      </button>
-      {open && (
-        <Modal title="בקשת הרשאת מנהל/ת" onClose={() => setOpen(false)}>
-          <p className="small muted">הבקשה תגיע לכל המנהלים במסך ההגדרות. כשהיא תאושר, תפריט הניהול יופיע אצלך לבד.</p>
-          <RequestAccessForm backend={backend} user={user} role="admin" />
-          <div className="row end">
-            <button className="ghost" onClick={() => setOpen(false)}>
-              סגירה
-            </button>
-          </div>
-        </Modal>
-      )}
-    </>
   );
 }

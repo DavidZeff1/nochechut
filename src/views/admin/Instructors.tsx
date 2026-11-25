@@ -357,7 +357,7 @@ export default function Instructors() {
                   <Link to={`/admin/course/${c.id}`}>{c.name}</Link>
                 </span>
               ))}
-              . מוסיפים מדריך/ה ב&quot;עריכת חוג ותמונה&quot;.
+              . מוסיפים מדריך/ה ב&quot;עריכת חוג&quot;.
             </div>
           )}
           {similar.map(([a, b]) => (
@@ -450,9 +450,7 @@ export default function Instructors() {
         })}
       </div>
       {!names.length && (
-        <div className="empty">
-          עוד אין מדריכים. מוסיפים עם &quot;+ מדריך/ה חדש/ה&quot; או ב&quot;עריכת חוג ותמונה&quot;.
-        </div>
+        <div className="empty">עוד אין מדריכים. מוסיפים עם &quot;+ מדריך/ה חדש/ה&quot; או ב&quot;עריכת חוג&quot;.</div>
       )}
 
       {editFor && (

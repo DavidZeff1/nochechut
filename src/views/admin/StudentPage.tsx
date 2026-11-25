@@ -3,10 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { useData } from '../../data/DataContext';
 import { dm, dmy } from '../../lib/dates';
 import { fmtPhone, telHref } from '../../lib/format';
-import type { Table } from '../../lib/csv';
 import { studentStats } from '../../lib/stats';
 import { CourseImage } from '../../ui/CourseImage';
-import { TableActions } from '../../ui/TableActions';
 import { EnrollStudentDialog, StudentDialog } from './dialogs';
 import { PctBar } from './shared';
 
@@ -27,24 +25,6 @@ export default function StudentPage() {
       </div>
     );
   const ens = X.enrollmentsByStudent[sid] || [];
-  const table = (): Table => ({
-    name: s.name,
-    head: ['חוג', 'סטטוס', 'הגיע/ה', 'לא הגיע/ה', 'אחוז נוכחות', 'הערות'],
-    rows: ens.map((e) => {
-      const st = studentStats(X, e.courseId, sid);
-      return [
-        S.courses[e.courseId]?.name || '(חוג שנמחק)',
-        e.active ? 'פעיל' : `הוסר ${e.removedAt ? dmy(e.removedAt) : ''}`,
-        st.v,
-        st.x,
-        st.pct == null ? '' : `${st.pct}%`,
-        st.items
-          .filter((i) => i.n)
-          .map((i) => `${dm(i.date)}: ${i.n}`)
-          .join(' | '),
-      ];
-    }),
-  });
   return (
     <>
       <div className="row">
@@ -73,7 +53,6 @@ export default function StudentPage() {
           <button className="ghost" onClick={() => setDlg('enroll')}>
             שיבוץ לחוג
           </button>
-          <TableActions table={table} />
         </div>
       </div>
       <div className="scards">
@@ -127,11 +106,6 @@ export default function StudentPage() {
                         </li>
                       ))}
                   </ul>
-                )}
-                {e.info && (
-                  <p className="muted small" style={{ marginTop: 10 }}>
-                    מהגיליון המקורי: {e.info}
-                  </p>
                 )}
               </div>
             );

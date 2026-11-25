@@ -43,6 +43,11 @@ export default function CourseRegister() {
   const c = S.courses[cid];
   // Open the register scrolled to the newest meetings (the far, left end in RTL).
   const wrapRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLDetailsElement>(null);
+  const pick = (d: Dlg) => {
+    if (moreRef.current) moreRef.current.open = false;
+    setDlg(d);
+  };
   const newest = courseSessions(X, cid).at(-1)?.date || '';
   useEffect(() => {
     wrapRef.current?.scrollTo({ left: -wrapRef.current.scrollWidth });
@@ -68,6 +73,8 @@ export default function CourseRegister() {
         (a.group || '').localeCompare(b.group || '', 'he') ||
         byName(a.st, b.st),
     );
+  // A group label only helps when the course has more than one group.
+  const multiGroup = new Set(ensAll.filter((e) => e.active).map((e) => e.group || '')).size > 1;
   const ens = ensAll.filter(
     (e) =>
       (showRemoved || e.active) && (!query || (e.st.name || '').includes(query) || (e.st.mother || '').includes(query)),
@@ -103,9 +110,9 @@ export default function CourseRegister() {
           → מבט-על
         </Link>
       </div>
-      <div className="course-hero">
-        <CourseImage course={c} className="hero-art" sizes="(max-width: 900px) 100vw, 520px" eager />
-        <div className="hero-text">
+      <div className="reg-head">
+        <CourseImage course={c} className="reg-art" sizes="160px" eager />
+        <div className="reg-title">
           <h1>{c.name}</h1>
           <div className="muted">
             {[
@@ -117,51 +124,40 @@ export default function CourseRegister() {
               .join(' · ')}
             {c.archived && <span className="tag red">בארכיון</span>}
           </div>
-          <div className="row" style={{ marginTop: 12 }}>
-            <button className="ghost" onClick={() => setDlg({ k: 'edit' })}>
-              עריכת חוג ותמונה
-            </button>
-            <button className="ghost" onClick={() => setDlg({ k: 'split' })}>
-              פיצול חוג
-            </button>
-            <button className="ghost" onClick={() => setDlg({ k: 'links' })}>
-              קישורים למדריך
-            </button>
+          <div className="reg-stats">
+            <span>
+              <b>{st.active}</b> תלמידים
+            </span>
+            <span>
+              <b>{st.held}</b> מפגשים
+            </span>
+            <span>
+              <b>{pctText(st.pct)}</b> נוכחות
+            </span>
+            <span>מפגש אחרון {st.last ? dm(st.last) : '–'}</span>
           </div>
         </div>
-      </div>
-      <div className="kpis">
-        <div className="kpi">
-          <b>{st.active}</b>תלמידים פעילים
-        </div>
-        <div className="kpi">
-          <b>{st.held}</b>מפגשים
-        </div>
-        <div className="kpi">
-          <b>{pctText(st.pct)}</b>אחוז נוכחות
-        </div>
-        <div className="kpi">
-          <b>{st.last ? dm(st.last) : '–'}</b>מפגש אחרון
+        <div className="reg-actions">
+          <button className="ghost sm" onClick={() => setDlg({ k: 'edit' })}>
+            עריכת חוג
+          </button>
+          <details className="more" ref={moreRef}>
+            <summary className="btn ghost sm">עוד ▾</summary>
+            <div className="more-menu">
+              <button className="ghost sm" onClick={() => pick({ k: 'split' })}>
+                פיצול חוג לשתי קבוצות
+              </button>
+              <button className="ghost sm" onClick={() => pick({ k: 'links' })}>
+                קישורים למדריך
+              </button>
+            </div>
+          </details>
         </div>
       </div>
       <div className="toolbar">
         <button className="pri sm" onClick={() => setDlg({ k: 'add' })}>
           + הוספת תלמיד/ה
         </button>
-        <input
-          type="date"
-          className="date-sm"
-          value={openDate}
-          onChange={(e) => setOpenDate(e.target.value)}
-          aria-label="תאריך מפגש"
-        />
-        <button className="ghost sm" onClick={() => nav(`/admin/session/${cid}/${compact(openDate || today())}`)}>
-          פתיחת מפגש לעריכה
-        </button>
-        <span className="grow" />
-        <TableActions table={table} />
-      </div>
-      <div className="toolbar" style={{ marginTop: 0 }}>
         <input
           type="search"
           placeholder="סינון לפי שם תלמיד/ה או אם"
@@ -175,11 +171,20 @@ export default function CourseRegister() {
             {removedN} שהוסרו
           </label>
         )}
+        <span className="grow" />
+        <input
+          type="date"
+          className="date-sm"
+          value={openDate}
+          onChange={(e) => setOpenDate(e.target.value)}
+          aria-label="תאריך מפגש"
+          title="לחיצה על תאריך בטבלה פותחת את אותו מפגש"
+        />
+        <button className="ghost sm" onClick={() => nav(`/admin/session/${cid}/${compact(openDate || today())}`)}>
+          פתיחת מפגש
+        </button>
+        <TableActions table={table} />
       </div>
-      <p className="muted small" style={{ margin: '0 0 8px' }}>
-        לחיצה על משבצת מתקנת נוכחות או הערה (הערות מופיעות בחום מתחת לסימון). לחיצה על תאריך: עריכת המפגש, הערת מפגש או
-        מחיקת העמודה.
-      </p>
       {ens.length ? (
         <div className="tblwrap" ref={wrapRef}>
           <table className="reg">
@@ -219,7 +224,7 @@ export default function CourseRegister() {
                   <tr key={e.id} className={e.active ? '' : 'removed'}>
                     <td className="fix">
                       <Link to={`/admin/student/${e.studentId}`}>{e.st.name}</Link>
-                      {e.group && <span className="muted small"> {e.group}</span>}
+                      {multiGroup && e.group && <span className="muted small"> {e.group}</span>}
                       {!e.active && <span className="tag red">הוסר {e.removedAt ? dm(e.removedAt) : ''}</span>}
                     </td>
                     <td>{e.st.mother}</td>

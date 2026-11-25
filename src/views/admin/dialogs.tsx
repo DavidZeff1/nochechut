@@ -10,31 +10,9 @@ import type { Course, Mark } from '../../lib/types';
 import { ConfirmModal, CopyFallbackModal, Modal } from '../../ui/Modal';
 import { copyToClipboard, useToast } from '../../ui/Toast';
 
-/** Center-crop an uploaded picture to 16:10 at up to 1600×1000 WebP. */
-async function cropTo16x10(file: File): Promise<Blob> {
-  const bmp = await createImageBitmap(file);
-  const target = 16 / 10;
-  let sw = bmp.width;
-  let sh = bmp.height;
-  if (sw / sh > target) sw = Math.round(sh * target);
-  else sh = Math.round(sw / target);
-  const sx = Math.round((bmp.width - sw) / 2);
-  const sy = Math.round((bmp.height - sh) / 2);
-  const w = Math.min(1600, sw);
-  const h = Math.round(w / target);
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  canvas.getContext('2d')!.drawImage(bmp, sx, sy, sw, sh, 0, 0, w, h);
-  return await new Promise<Blob>((res, rej) =>
-    canvas.toBlob((b) => (b ? res(b) : rej(new Error('encode'))), 'image/webp', 0.85),
-  );
-}
-
 export function CourseDialog({ cid, onClose }: { cid: string | null; onClose: () => void }) {
-  const { S, backend } = useData();
+  const { S } = useData();
   const actions = useActions();
-  const toast = useToast();
   const nav = useNavigate();
   const c: Course = (cid && S.courses[cid]) || { name: '', day: null, time: '', instructors: [], archived: false };
   const [name, setName] = useState(c.name);
@@ -43,40 +21,18 @@ export function CourseDialog({ cid, onClose }: { cid: string | null; onClose: ()
   const [ins, setIns] = useState((c.instructors || []).join(', '));
   const [archived, setArchived] = useState(!!c.archived);
   const [image, setImage] = useState(c.image || '');
-  const [uploading, setUploading] = useState(false);
   const preview = courseImage({ name: name || c.name, image });
 
   return (
     <Modal title={cid ? 'עריכת חוג' : 'חוג חדש'} onClose={onClose}>
       <img className="dlg-art" src={preview.src} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} />
-      <div className="row">
-        <label className="btn ghost sm file">
-          {uploading ? 'מעלה…' : 'החלפת תמונה'}
-          <input
-            type="file"
-            accept="image/*"
-            disabled={uploading}
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (!f) return;
-              setUploading(true);
-              try {
-                const blob = await cropTo16x10(f);
-                setImage(await backend.uploadCourseImage(cid || 'new', blob));
-              } catch {
-                toast('העלאת התמונה נכשלה', { error: true });
-              } finally {
-                setUploading(false);
-              }
-            }}
-          />
-        </label>
-        {image && (
+      {image && (
+        <div className="row">
           <button className="link small" onClick={() => setImage('')}>
             חזרה לאיור לפי סוג החוג
           </button>
-        )}
-      </div>
+        </div>
+      )}
       <label className="fld">
         שם החוג *<input id="cName" value={name} onChange={(e) => setName(e.target.value)} />
       </label>
@@ -113,7 +69,6 @@ export function CourseDialog({ cid, onClose }: { cid: string | null; onClose: ()
         </button>
         <button
           className="pri"
-          disabled={uploading}
           onClick={() => {
             if (!name.trim()) return;
             const id = actions.saveCourse(cid, {

@@ -76,7 +76,9 @@ export function Home() {
   const { S } = useData();
   const auth = useAuth();
   const profileName = auth.status === 'ready' ? auth.profile.instructorName || '' : '';
-  const [me, setMe] = useState(() => readMe() || profileName);
+  // An instructor whose account is linked to a name sees their own courses without choosing.
+  const locked = auth.status === 'ready' && auth.profile.role !== 'admin' && !!profileName;
+  const [me, setMe] = useState(() => (locked ? profileName : readMe() || profileName));
   const [showAll, setShowAll] = useState(false);
   const names = allInstructors(S);
   const all = activeCourses(S);
@@ -119,27 +121,29 @@ export function Home() {
           <h1>{useMine ? `שלום, ${me}` : 'נוכחות חוגים'}</h1>
           <p className="lead">{longDate(t)}</p>
         </div>
-        <label className="fld me">
-          אני המדריך/ה
-          <select
-            id="meSel"
-            value={me}
-            onChange={(e) => {
-              setMe(e.target.value);
-              setShowAll(false);
-              try {
-                localStorage.setItem(ME_KEY, e.target.value);
-              } catch {
-                /* ignore */
-              }
-            }}
-          >
-            <option value="">כל החוגים</option>
-            {names.map((n) => (
-              <option key={n}>{n}</option>
-            ))}
-          </select>
-        </label>
+        {!locked && (
+          <label className="fld me">
+            אני המדריך/ה
+            <select
+              id="meSel"
+              value={me}
+              onChange={(e) => {
+                setMe(e.target.value);
+                setShowAll(false);
+                try {
+                  localStorage.setItem(ME_KEY, e.target.value);
+                } catch {
+                  /* ignore */
+                }
+              }}
+            >
+              <option value="">כל החוגים</option>
+              {names.map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+        )}
       </section>
       {me && mine.length > 0 && (
         <p className="muted small" style={{ marginTop: 10 }}>

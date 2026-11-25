@@ -36,7 +36,7 @@ export function NotesTable({ courseId, limit }: { courseId?: string; limit?: num
               <th>תלמיד/ה</th>
               <th>הערה</th>
               <th>נכתבה</th>
-              <th />
+              {courseId && <th />}
             </tr>
           </thead>
           <tbody>
@@ -64,11 +64,14 @@ export function NotesTable({ courseId, limit }: { courseId?: string; limit?: num
                 </td>
                 <td className="nt">{x.n}</td>
                 <td className="muted small">{formatTimestamp(x.t)}</td>
-                <td>
-                  <button className="ghost sm" onClick={() => setDel(x)}>
-                    מחיקה
-                  </button>
-                </td>
+                {/* Deleting is kept to a course's own register, away from the busy overview. */}
+                {courseId && (
+                  <td>
+                    <button className="ghost sm" onClick={() => setDel(x)}>
+                      מחיקה
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

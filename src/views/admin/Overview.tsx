@@ -228,21 +228,14 @@ export default function Overview() {
           <b>{list.filter((c) => !c.archived).length}</b>חוגים פעילים
         </div>
         <div className="kpi">
-          <b>{uniq}</b>משתתפים שונים
-        </div>
-        <div className="kpi">
-          <b>{ta}</b>שיבוצים פעילים
-        </div>
-        <div className="kpi">
-          <b>{th}</b>מפגשים שנרשמו
+          <b>{uniq}</b>תלמידים פעילים
         </div>
         <div className="kpi">
           <b>{pctText(tp)}</b>נוכחות כוללת
         </div>
       </div>
       <WeekBoard />
-      <div className="two" style={{ marginTop: 22 }}>
-        <Trend />
+      <div style={{ marginTop: 22 }}>
         <FollowUp />
       </div>
       <h2 className="sec">כל החוגים</h2>
@@ -325,6 +318,10 @@ export default function Overview() {
           </tfoot>
         </table>
       </div>
+      <details className="fold">
+        <summary>גרף נוכחויות לפי שבוע (12 השבועות האחרונים)</summary>
+        <Trend />
+      </details>
       <h2 className="sec">
         הערות אחרונות<span className="muted">מכל החוגים, החדשות למעלה</span>
       </h2>

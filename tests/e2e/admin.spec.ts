@@ -24,7 +24,8 @@ test.describe('admin', () => {
 
   test('splits a course and opens the new one', async ({ page }) => {
     await open(page, '/admin/course/c03', 'admin');
-    await page.getByRole('button', { name: 'פיצול חוג' }).click();
+    await page.getByText('עוד ▾').click();
+    await page.getByRole('button', { name: 'פיצול חוג לשתי קבוצות' }).click();
     const dlg = page.getByRole('dialog');
     await dlg.getByLabel('שם החוג החדש *').fill('זומבה מתקדמות');
     await dlg.getByRole('checkbox').first().check();
@@ -52,5 +53,22 @@ test.describe('admin', () => {
     await open(page, '/admin/students', 'admin');
     await page.getByPlaceholder('חיפוש לפי שם, שם האם או טלפון').fill('לוי');
     await expect(page.locator('tbody tr').first()).toContainText('לוי');
+  });
+});
+
+test.describe('decluttered screens', () => {
+  test('the course dialog no longer offers a picture upload', async ({ page }) => {
+    await open(page, '/admin/course/c01', 'admin');
+    await page.getByRole('button', { name: 'עריכת חוג' }).click();
+    await expect(page.getByRole('dialog').getByText('החלפת תמונה')).toHaveCount(0);
+  });
+
+  test('an instructor linked to a name sees no instructor picker and no admin button in the header', async ({
+    page,
+  }) => {
+    await open(page, '/', 'instructor');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('שלום, שרית');
+    await expect(page.getByLabel('אני המדריך/ה')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'בקשת הרשאת מנהל/ת' })).toHaveCount(0);
   });
 });

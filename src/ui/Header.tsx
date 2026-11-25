@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { RequestAdminButton } from '../auth/AccessRequest';
 import { useAuth } from '../auth/AuthContext';
 import type { Backend, DemoView } from '../data/backend';
 import { useData } from '../data/DataContext';
@@ -82,7 +81,6 @@ export function Header() {
             ) : (
               <>
                 <Link to="/guide">עזרה</Link>
-                {auth.status === 'ready' && <RequestAdminButton backend={backend} user={auth.user} />}
                 {backend.kind === 'firebase' && (
                   <button className="navbtn" onClick={() => backend.signOut()}>
                     יציאה

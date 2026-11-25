@@ -396,7 +396,6 @@ export function SessionView({ admin = false }: { admin?: boolean }) {
                       </div>
                       <div className="meta">
                         {e.st.age && <span>גיל {e.st.age}</span>}
-                        {!multi && e.group && <span>{e.group}</span>}
                         {prev.length > 0 && (
                           <span className="dots" title="המפגשים הקודמים">
                             {prev.map((d) => {

@@ -49,7 +49,6 @@ test.describe('access requests', () => {
     await expect(page.getByRole('heading', { name: 'המסך הזה מיועד למנהלים' })).toBeVisible();
     await page.getByRole('button', { name: 'שליחת בקשה למנהל/ת' }).click();
     await expect(page.getByRole('status').first()).toContainText('מחכה לאישור');
-    await expect(page.getByRole('button', { name: 'בקשה ממתינה' })).toBeVisible();
 
     await switchView(page, 'תצוגת מנהל/ת');
     await page.goto('/admin/settings');

@@ -122,10 +122,6 @@ async function main() {
     await p.mouse.wheel(0, 3000);
     await shot(p, 'session-summary', { fullPage: false });
 
-    p = await open(browser, 'instructor', '/', true);
-    await btn(p, 'בקשת הרשאת מנהל/ת').click();
-    await shot(p, 'request-admin');
-
     p = await open(browser, 'instructor', '/admin', true);
     await shot(p, 'adminonly');
 
@@ -149,14 +145,16 @@ async function main() {
     await shot(p, 'register-cell');
 
     p = await open(browser, 'admin', '/admin/course/c01', false);
-    await btn(p, 'עריכת חוג ותמונה').click();
+    await btn(p, 'עריכת חוג').click();
     await shot(p, 'course-edit');
 
     p = await open(browser, 'admin', '/admin/course/c01', false);
-    await btn(p, 'פיצול חוג').click();
+    await p.getByText('עוד ▾').click();
+    await btn(p, 'פיצול חוג לשתי קבוצות').click();
     await shot(p, 'course-split');
 
     p = await open(browser, 'admin', '/admin/course/c01', false);
+    await p.getByText('עוד ▾').click();
     await btn(p, 'קישורים למדריך').click();
     await shot(p, 'course-links');
 
