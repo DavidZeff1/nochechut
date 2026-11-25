@@ -55,7 +55,7 @@
       "generationId": "A0PXfhqCNAPkp6OaYzPH",
       "label": "מוזיקה",
       "scene": "a music room with an acoustic guitar, a darbuka drum, a keyboard and floating musical notes",
-      "keywords": ["מוזיקה", "מוסיקה", "גיטרה", "תופים", "פסנתר", "מקהלה", "שירה", "כינור", "אורגן", "דרבוקה"]
+      "keywords": ["מוזיקה", "מוסיקה", "גיטרה", "תופים", "פסנתר", "מקהלה", "כינור", "אורגן", "דרבוקה"]
     },
     "sports": {
       "generationId": "nn6RaChEMdBDzj6TI7nG",
@@ -92,6 +92,24 @@
       "label": "ברייקדנס",
       "scene": "a boy wearing a kippah in a freeze pose balanced on one hand on a flattened cardboard mat in a sunny stone courtyard, three friends clapping, a small speaker on a stone step, swirls of motion",
       "keywords": ["ברייקדנס", "ברייק", "היפ הופ", "היפ-הופ"]
+    },
+    "voice": {
+      "source": "ChatGPT (image generation), 2026-11-25",
+      "label": "פיתוח קול",
+      "scene": "a singing lesson: a girl in a long skirt singing beside an upright piano, the teacher at the piano seen from behind, musical notes in a bright room with arched windows",
+      "keywords": ["פיתוח קול", "פיתוח הקול", "זמרה", "שירה"]
+    },
+    "english": {
+      "source": "ChatGPT (image generation), 2026-11-25",
+      "label": "אנגלית",
+      "scene": "a small English lesson: children at wooden desks seen from behind, a blue chalkboard with drawings of an apple, a sun and a house, picture books, a globe, an arched window onto old stone houses",
+      "keywords": ["אנגלית", "אנגלי", "שפות"]
+    },
+    "roleplay": {
+      "source": "ChatGPT (image generation), 2026-11-25",
+      "label": "משחקי תפקידים",
+      "scene": "a fantasy role-playing game club: children around a table seen from the shoulders down, a painted map with castles and a dragon, dice mid-roll, knight figures and blank character cards",
+      "keywords": ["מבוכים", "מבוך", "דרקונים", "משחקי תפקידים", "D&D"]
     },
     "community": {
       "generationId": "GBFJlcKVpiBvsccsTNAE",
