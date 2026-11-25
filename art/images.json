@@ -75,6 +75,18 @@
       "scene": "a science and robotics workshop table: a small wheeled robot, circuit parts, a magnifying glass and a globe",
       "keywords": ["מדע", "רובוט", "מחשב", "תכנות", "מדעים", "אסטרונומיה"]
     },
+    "sewing": {
+      "generationId": "daPrTGKWtPfLXSuccAsZ",
+      "label": "תפירה וסריגה",
+      "scene": "a sewing and knitting circle — women in modest long-sleeved clothing and head coverings, seen from behind and the side, around a wooden table with a sewing machine, balls of yarn, knitting needles, a measuring tape and folded fabric in blue and cream; a window with a view of old stone houses",
+      "keywords": ["תפיר", "סריג", "רקמה", "טלאים", "מקרמה"]
+    },
+    "mishnah-crafts": {
+      "generationId": "XEFvVggIpVlVp46YtaBm",
+      "label": "משניות ומלאכות",
+      "scene": "a boys' after-school Mishnah and crafts club — three young boys wearing kippot at a long wooden table, on one side a large open book on a wooden book stand, on the other side wooden craft pieces, glue and paintbrushes with a half-built little wooden house; shelves of old books in the background",
+      "keywords": ["משני", "משנה", "גמרא", "תורה", "מלאכות"]
+    },
     "community": {
       "generationId": "GBFJlcKVpiBvsccsTNAE",
       "label": "קהילה",
