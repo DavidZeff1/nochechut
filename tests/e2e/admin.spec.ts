@@ -5,7 +5,21 @@ test.describe('admin', () => {
   test('overview loads without horizontal page scroll', async ({ page }) => {
     await open(page, '/admin', 'admin');
     await expect(page.getByRole('heading', { name: 'מבט-על' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'זומבה' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /חוגים פעילים/ })).toBeVisible();
+    await noHorizontalScroll(page);
+  });
+
+  test('courses tab lists, searches and opens courses', async ({ page }) => {
+    await open(page, '/admin', 'admin');
+    await page.getByRole('link', { name: /חוגים פעילים/ }).click();
+    await expect(page).toHaveURL(/\/admin\/courses$/);
+    await expect(page.getByRole('heading', { name: 'חוגים' })).toBeVisible();
+    const rows = page.locator('tbody tr');
+    expect(await rows.count()).toBeGreaterThan(3);
+    await page.getByLabel('חיפוש חוג').fill('זומבה');
+    await expect(rows).toHaveCount(1);
+    await page.getByRole('link', { name: 'זומבה' }).click();
+    await expect(page).toHaveURL(/\/admin\/course\//);
     await noHorizontalScroll(page);
   });
 

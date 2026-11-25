@@ -137,6 +137,9 @@ async function main() {
     await p.mouse.wheel(0, -80);
     await shot(p, 'overview-risk');
 
+    p = await open(browser, 'admin', '/admin/courses', false);
+    await shot(p, 'courses');
+
     p = await open(browser, 'admin', '/admin/course/c01', false);
     await shot(p, 'register');
 

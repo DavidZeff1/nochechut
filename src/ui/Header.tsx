@@ -64,6 +64,7 @@ export function Header() {
                 <NavLink to="/admin" end>
                   מבט-על
                 </NavLink>
+                <NavLink to="/admin/courses">חוגים</NavLink>
                 <NavLink to="/admin/students">תלמידים</NavLink>
                 <NavLink to="/admin/instructors">מדריכים</NavLink>
                 <NavLink
