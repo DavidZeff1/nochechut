@@ -4,8 +4,19 @@ import { fmtPhone, normPhone, splitInstructors, telHref } from './format';
 import { activitySlug, courseImage } from './images';
 import { legacyHashToPath } from './legacy';
 import { toCsv, toTsv, safeFileName } from './csv';
-import { buildIndex, countMarks, courseStats, getRecord, heldDates, rosterFor, sessId, studentStats } from './stats';
+import {
+  buildIndex,
+  countMarks,
+  courseStats,
+  getRecord,
+  heldDates,
+  rosterFor,
+  sessId,
+  studentStats,
+  weekBoard,
+} from './stats';
 import type { DataState } from './types';
+import { parentText, reminderText, waHref, waNumber } from './whatsapp';
 
 describe('dates', () => {
   it('moves across month and year boundaries', () => {
@@ -126,5 +137,55 @@ describe('stats', () => {
     expect(courseStats(X, 'c1')).toMatchObject({ v: 3, x: 2, held: 2, last: '2026-11-17', active: 2, pct: 60 });
     expect(studentStats(X, 'c1', 'a')).toMatchObject({ v: 2, x: 1, pct: 67 });
     expect(studentStats(X, 'c1', 'b').items).toHaveLength(2);
+  });
+});
+
+describe('whatsapp links', () => {
+  it('turns Israeli numbers into WhatsApp numbers', () => {
+    expect(waNumber('054-123-4567')).toBe('972541234567');
+    expect(waNumber('+972 54 123 4567')).toBe('972541234567');
+    expect(waNumber('541234567')).toBe('972541234567');
+    expect(waNumber('')).toBe('');
+    expect(waNumber('123')).toBe('');
+  });
+
+  it('opens the chat with the message typed in, or lets you pick a contact', () => {
+    expect(waHref('0541234567', 'שלום & תודה')).toBe(
+      `https://wa.me/972541234567?text=${encodeURIComponent('שלום & תודה')}`,
+    );
+    expect(waHref(undefined, 'hi')).toBe('https://wa.me/?text=hi');
+  });
+
+  it('writes a reminder with a link to that session', () => {
+    const t = reminderText('ליאת כהן', 'זומבה', 'c03', '2026-11-23', 'https://x.app');
+    expect(t).toContain('היי ליאת,');
+    expect(t).toContain('זומבה');
+    expect(t).toContain('23/11');
+    expect(t).toContain('https://x.app/course/c03/20261123');
+  });
+
+  it('writes a friendly note to a parent', () => {
+    expect(parentText('סיגל לוי', 'נועה', 'תאטרון')).toMatch(/^שלום סיגל, .*נועה.*תאטרון/);
+    expect(parentText(undefined, 'נועה', 'תאטרון')).toMatch(/^שלום, /);
+  });
+});
+
+describe('week board', () => {
+  const S = (time: string): DataState => ({
+    courses: { c1: { name: 'אומנות', day: 3, time, instructors: [], archived: false } },
+    students: {},
+    enrollments: {},
+    sessions: {},
+    instructors: {},
+    config: {},
+  });
+  const item = (time: string, now: string) => weekBoard(S(time), '2026-11-25', now);
+
+  it("treats today's class as due only after it starts", () => {
+    expect(item('16:30', '12:00').columns[0].items[0].state).toBe('up');
+    expect(item('16:30', '12:00').due).toBe(0);
+    expect(item('16:30', '16:31').columns[0].items[0].state).toBe('miss');
+    expect(item('9:00', '10:00').columns[0].items[0].state).toBe('miss');
+    expect(item('', '08:00').columns[0].items[0].state).toBe('miss');
   });
 });

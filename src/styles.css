@@ -2244,3 +2244,42 @@ a.kpi-link {
 a.kpi-link:hover {
   outline: 2px solid var(--blue);
 }
+/* WhatsApp shortcuts */
+.wslot {
+  display: grid;
+  gap: 4px;
+}
+.wa-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+a.wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, #1a8a4a 45%, var(--line));
+  color: #136b39;
+  background: color-mix(in srgb, #1a8a4a 8%, var(--bg));
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.wa::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #25d366;
+}
+a.wa:hover {
+  background: color-mix(in srgb, #1a8a4a 16%, var(--bg));
+}
+.rk-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

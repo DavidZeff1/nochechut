@@ -90,6 +90,8 @@ export function demoSeed(ref = today()): Record<string, DocData> {
       };
     }
   });
+  // One instructor with a (made-up) phone, so the WhatsApp reminder opens her chat directly.
+  out[`instructors/${encodeURIComponent('ליאת')}`] = { name: 'ליאת', phone: '0501111111' };
   out['config/app'] = { plan_split_2026_11_22: true };
   // One waiting access request, so the admin's Settings screen shows how approving works.
   out['accessRequests/noa.demo@example.com'] = {

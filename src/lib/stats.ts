@@ -137,7 +137,17 @@ export interface WeekItem {
   v: number;
 }
 
-export function weekBoard(S: DataState, ref = today()) {
+/** The local time of day as HH:MM. */
+const nowHM = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
+
+/**
+ * This week's sessions by day. A session is due once its day has come and, for today, once its start
+ * time has passed (a class with no time counts as due all day).
+ */
+export function weekBoard(S: DataState, ref = today(), now = nowHM()) {
   const ws = weekStart(ref);
   const act = activeCourses(S);
   const days = [0, 1, 2, 3, 4, 5, 6].filter((d) => act.some((c) => c.day === d));
@@ -149,7 +159,9 @@ export function weekBoard(S: DataState, ref = today()) {
       .filter((c) => c.day === d)
       .map((course) => {
         const cv = countMarks(S.sessions[sessId(course.id, date)]?.records);
-        const future = date > ref;
+        const future =
+          date > ref ||
+          (date === ref && !!course.time && /^\d{1,2}:\d{2}$/.test(course.time) && course.time.padStart(5, '0') > now);
         const state: WeekItem['state'] = future ? 'up' : cv.v + cv.x ? 'ok' : 'miss';
         if (!future) {
           due++;

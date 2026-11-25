@@ -172,3 +172,30 @@ test.describe('end-to-end flows', () => {
     expect(Object.keys(data.sessions).length).toBeGreaterThan(10);
   });
 });
+
+test.describe('whatsapp shortcuts', () => {
+  test('reminds the instructor of an unmarked session and messages a parent', async ({ page }) => {
+    // A Wednesday, so Monday's zumba (left unmarked in the demo data) is already due.
+    await page.clock.setFixedTime(new Date('2026-11-25T12:00:00+02:00'));
+    await open(page, '/admin', 'admin');
+    const slot = page.locator('.wslot', { hasText: 'זומבה' });
+    await expect(slot.locator('.witem.miss')).toBeVisible();
+    const remind = slot.getByRole('link', { name: 'תזכורת לליאת' });
+    const href = decodeURIComponent((await remind.getAttribute('href'))!);
+    expect(href).toMatch(/^https:\/\/wa\.me\/972501111111\?text=היי ליאת, /);
+    expect(href).toContain('/course/c03/20261123');
+    await expect(remind).toHaveAttribute('target', '_blank');
+
+    // Only sessions that were due and not marked get a reminder.
+    const misses = await page.locator('.witem.miss').count();
+    await expect(page.locator('.wslot:has(.witem.miss) .wa-row')).toHaveCount(misses);
+    await expect(page.locator('.wslot:not(:has(.witem.miss)) .wa-row')).toHaveCount(0);
+
+    const risk = page.locator('.rk').first();
+    await expect(risk).toBeVisible();
+    const parent = decodeURIComponent((await risk.getByRole('link', { name: 'וואטסאפ' }).getAttribute('href'))!);
+    expect(parent).toMatch(/^https:\/\/wa\.me\/9725\d{8}\?text=שלום /);
+    expect(parent).toContain('כאן מגרעין אומץ עכו');
+    await noHorizontalScroll(page);
+  });
+});

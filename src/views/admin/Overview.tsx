@@ -5,8 +5,37 @@ import { compact, DAYS, dm, today } from '../../lib/dates';
 import { fmtPhone, pctText, telHref } from '../../lib/format';
 import type { Table } from '../../lib/csv';
 import { allNotes, courseStats, followUpList, weekBoard, weeklyTrend } from '../../lib/stats';
+import { profileFor } from '../../lib/instructors';
+import type { CourseWithId } from '../../lib/types';
+import { parentText, reminderText, waHref, waNumber } from '../../lib/whatsapp';
 import { TableActions } from '../../ui/TableActions';
 import { NotesTable } from './shared';
+
+/** WhatsApp reminder links for a session nobody marked: one per instructor of the course. */
+function Remind({ course, date }: { course: CourseWithId; date: string }) {
+  const { S } = useData();
+  const names = course.instructors?.length ? course.instructors : [''];
+  return (
+    <span className="wa-row">
+      {names.map((n) => {
+        const phone = n ? profileFor(S, n)?.phone : undefined;
+        const has = !!waNumber(phone);
+        return (
+          <a
+            key={n || '-'}
+            className="wa"
+            href={waHref(phone, reminderText(n, course.name, course.id, date, window.location.origin))}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={has ? `שליחת תזכורת ל${n} בוואטסאפ` : 'אין טלפון שמור – בוואטסאפ בוחרים למי לשלוח'}
+          >
+            תזכורת{n ? ` ל${n}` : ''}
+          </a>
+        );
+      })}
+    </span>
+  );
+}
 
 function WeekBoard() {
   const { S } = useData();
@@ -31,17 +60,25 @@ function WeekBoard() {
                 </span>
               </div>
               {col.items.map((it) => (
-                <button
-                  key={it.course.id}
-                  className={`witem ${it.state}`}
-                  onClick={() => nav(`/admin/session/${it.course.id}/${compact(it.date)}`)}
-                >
-                  <b>{it.course.name}</b>
-                  <span>
-                    {it.course.time ? `${it.course.time} · ` : ''}
-                    {it.state === 'ok' ? `${it.v} הגיעו` : it.state === 'miss' ? 'לא סומן' : 'בהמשך השבוע'}
-                  </span>
-                </button>
+                <div key={it.course.id} className="wslot">
+                  <button
+                    className={`witem ${it.state}`}
+                    onClick={() => nav(`/admin/session/${it.course.id}/${compact(it.date)}`)}
+                  >
+                    <b>{it.course.name}</b>
+                    <span>
+                      {it.course.time ? `${it.course.time} · ` : ''}
+                      {it.state === 'ok'
+                        ? `${it.v} הגיעו`
+                        : it.state === 'miss'
+                          ? 'לא סומן'
+                          : it.date === t
+                            ? 'בהמשך היום'
+                            : 'בהמשך השבוע'}
+                    </span>
+                  </button>
+                  {it.state === 'miss' && <Remind course={it.course} date={it.date} />}
+                </div>
               ))}
             </div>
           ))}
@@ -126,9 +163,25 @@ function FollowUp() {
                 <span className="muted small">· {r.course.name}</span>
               </span>
               {r.enrollment.st.phone ? (
-                <a className="tel" href={telHref(r.enrollment.st.phone)}>
-                  {fmtPhone(r.enrollment.st.phone)}
-                </a>
+                <span className="rk-contact">
+                  <a className="tel" href={telHref(r.enrollment.st.phone)}>
+                    {fmtPhone(r.enrollment.st.phone)}
+                  </a>
+                  {waNumber(r.enrollment.st.phone) && (
+                    <a
+                      className="wa"
+                      href={waHref(
+                        r.enrollment.st.phone,
+                        parentText(r.enrollment.st.mother, r.enrollment.st.name, r.course.name),
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={`הודעה בוואטסאפ ל${r.enrollment.st.mother || 'הורים'}`}
+                    >
+                      וואטסאפ
+                    </a>
+                  )}
+                </span>
               ) : (
                 <span className="muted small">אין טלפון</span>
               )}
