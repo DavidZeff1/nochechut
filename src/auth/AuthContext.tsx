@@ -23,11 +23,15 @@ export function AuthProvider({ backend, children }: { backend: Backend; children
       }
       setState({ status: 'loading' });
       let claimed = false;
+      // True while the first-sign-in profile is being written. The snapshot listener sees that
+      // write locally before the server has it, and the security rules check the server copy,
+      // so the data must not start loading until the write is confirmed.
+      let creating = false;
       unsubProfile = backend.watchDoc<UserProfile>(
         `users/${user.uid}`,
         async (profile) => {
           if (profile) {
-            setState({ status: 'ready', user, profile });
+            if (!creating) setState({ status: 'ready', user, profile });
             return;
           }
           // First sign-in: turn an invite for this email into a profile.
@@ -39,13 +43,18 @@ export function AuthProvider({ backend, children }: { backend: Backend; children
               setState({ status: 'noAccess', user });
               return;
             }
-            await backend.setDoc(`users/${user.uid}`, {
+            const created: UserProfile = {
               role: invite.role,
               email: user.email,
               name: user.displayName || '',
               instructorName: invite.instructorName || '',
-            });
+            };
+            creating = true;
+            await backend.setDoc(`users/${user.uid}`, { ...created });
+            creating = false;
+            setState({ status: 'ready', user, profile: created });
           } catch {
+            creating = false;
             setState({ status: 'noAccess', user });
           }
         },
