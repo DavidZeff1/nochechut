@@ -22,7 +22,8 @@ export const ACTIVITY_IMAGES: ActivityImage[] = [
   { slug: 'hairstyling', label: 'תסרוקות', keywords: ['תסרוק', 'שיער', 'צמות', 'איפור', 'קוסמטיקה', 'ציפורניים'] },
   { slug: 'zumba', label: 'זומבה וכושר', keywords: ['זומבה', 'אירובי', 'כושר', 'פילאטיס', 'יוגה', 'התעמלות'] },
   { slug: 'theatre', label: 'תאטרון', keywords: ['תאטרון', 'תיאטרון', 'דרמה', 'במה', 'סטנדאפ'] },
-  { slug: 'jewish-dance', label: 'מחול', keywords: ['מחול', 'ריקוד', 'רוקדים', 'בלט', 'היפ הופ', 'ג׳אז', 'דבקה'] },
+  { slug: 'breakdance', label: 'ברייקדנס', keywords: ['ברייקדנס', 'ברייק', 'היפ הופ', 'היפ-הופ'] },
+  { slug: 'jewish-dance', label: 'מחול', keywords: ['מחול', 'ריקוד', 'רוקדים', 'בלט', 'ג׳אז', 'דבקה'] },
   { slug: 'surfing', label: 'גלישה', keywords: ['גלישה', 'גלישת', 'שחייה', 'קייאק', 'שייט'] },
   { slug: 'chess', label: 'שחמט', keywords: ['שחמט', 'שח-מט', 'משחקי חשיבה', 'בריג׳'] },
   {

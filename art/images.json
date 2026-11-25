@@ -37,7 +37,7 @@
       "generationId": "dmb29YVPSHUUhJvQ7Gla",
       "label": "מחול",
       "scene": "a circle of dancers holding hands in a joyful hora-style folk dance in a stone courtyard, skirts swirling",
-      "keywords": ["מחול", "ריקוד", "רוקדים", "בלט", "היפ הופ", "ג׳אז", "דבקה"]
+      "keywords": ["מחול", "ריקוד", "רוקדים", "בלט", "ג׳אז", "דבקה"]
     },
     "surfing": {
       "generationId": "23a9zt4grA9IJaCN1Uhf",
@@ -86,6 +86,12 @@
       "label": "משניות ומלאכות",
       "scene": "a boys' after-school Mishnah and crafts club — three young boys wearing kippot at a long wooden table, on one side a large open book on a wooden book stand, on the other side wooden craft pieces, glue and paintbrushes with a half-built little wooden house; shelves of old books in the background",
       "keywords": ["משני", "משנה", "גמרא", "תורה", "מלאכות"]
+    },
+    "breakdance": {
+      "source": "ChatGPT (image generation), 2026-11-25",
+      "label": "ברייקדנס",
+      "scene": "a boy wearing a kippah in a freeze pose balanced on one hand on a flattened cardboard mat in a sunny stone courtyard, three friends clapping, a small speaker on a stone step, swirls of motion",
+      "keywords": ["ברייקדנס", "ברייק", "היפ הופ", "היפ-הופ"]
     },
     "community": {
       "generationId": "GBFJlcKVpiBvsccsTNAE",
