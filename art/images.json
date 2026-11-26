@@ -116,6 +116,12 @@
       "label": "קהילה",
       "scene": "a welcoming stone community-center building in Acre with arched doorway, potted plants and people of all ages walking in",
       "keywords": []
+    },
+    "womens-circle": {
+      "source": "ChatGPT (image generation), 2026-11-26",
+      "label": "מפגש נשים",
+      "scene": "a calm women's discussion circle: women in modest clothing and head coverings, seen from a distance, sitting in a circle on comfortable armchairs in a warm living room, cups of tea on a low round table, potted plants, soft afternoon light through an arched window onto old stone houses",
+      "keywords": ["ימימה", "מפגש נשים", "מעגל נשים"]
     }
   }
 }

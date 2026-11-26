@@ -39,6 +39,7 @@ export const ACTIVITY_IMAGES: ActivityImage[] = [
   { slug: 'science', label: 'מדע', keywords: ['מדע', 'רובוט', 'מחשב', 'תכנות', 'מדעים', 'אסטרונומיה'] },
   { slug: 'sewing', label: 'תפירה וסריגה', keywords: ['תפיר', 'סריג', 'רקמה', 'טלאים', 'מקרמה'] },
   { slug: 'mishnah-crafts', label: 'משניות ומלאכות', keywords: ['משני', 'משנה', 'גמרא', 'תורה', 'מלאכות'] },
+  { slug: 'womens-circle', label: 'מפגש נשים', keywords: ['ימימה', 'מפגש נשים', 'מעגל נשים'] },
   // Checked last: generic words like "יצירה" would otherwise swallow more specific names.
   { slug: 'art', label: 'אומנות', keywords: ['אומנות', 'אמנות', 'ציור', 'יצירה', 'קרמיקה', 'פיסול', 'רישום', 'צילום'] },
 ];

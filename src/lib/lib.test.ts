@@ -56,6 +56,7 @@ describe('course images', () => {
     expect(activitySlug('תסרוקות לבנות')).toBe('hairstyling');
     expect(activitySlug('זומבה')).toBe('zumba');
     expect(activitySlug('תאטרון')).toBe('theatre');
+    expect(activitySlug('ימימה')).toBe('womens-circle');
     expect(activitySlug('מחול יהודי')).toBe('jewish-dance');
     expect(activitySlug('גלישה')).toBe('surfing');
     expect(activitySlug('שחמט')).toBe('chess');
